@@ -1,0 +1,10 @@
+docker-build: # Create a new job.
+# Use the official docker image.
+  image: docker:latest
+  stage: build
+  #tags:
+  #  - carlinfg  # Ajoutez du tag du runner privé à utiliser
+  services:
+    - docker:dind
+  script:
+    - docker build -t staticapp .
