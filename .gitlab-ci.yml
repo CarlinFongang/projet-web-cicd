@@ -22,8 +22,8 @@ test acceptation:
     - docker rmi -f staticapp || echo "image already deleted" 
     - docker load < staticapp.tar
     - docker rm -vf staticapp-test || echo "container already cleaned"
-    - docker run -d -p 8090:80 -e PORT=80 --name staticapp-test staticapp
+    - docker run -d -p 80:80 -e PORT=80 --name staticapp-test staticapp
     - sleep 5
     - apk --no-cache add curl
-    - curl "http://docker-vm:8090" | grep  "Hello world!"
+    - curl "http://docker-vm" | grep  "Hello world!"
     - docker rm -vf staticapp-test && echo "clean container"
