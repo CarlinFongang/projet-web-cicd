@@ -12,10 +12,9 @@ docker-build:
   script:
     - docker build -t staticapp .
     - docker save staticapp > staticapp.tar
-  
-artifacts:
-  paths:
-    - staticapp.tar  
+  artifacts:
+    paths:
+      - staticapp.tar 
 
 test acceptation:
   stage: Test acceptation
