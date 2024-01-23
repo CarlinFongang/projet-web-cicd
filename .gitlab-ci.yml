@@ -1,14 +1,18 @@
 image: docker:latest
+
 services:
   - name: docker:dind
     alias: docker-vm    
 
 stages:
-  - Build
-  - Test acceptation
+  - build
+  - test-acceptation
+
+before_script:
+  - docker info
 
 docker-build:
-  stage: Build
+  stage: build
   script:
     - docker build -t staticapp .
     - docker save staticapp > staticapp.tar
@@ -16,14 +20,15 @@ docker-build:
     paths:
       - staticapp.tar 
 
-test acceptation:
-  stage: Test acceptation
+test-acceptation:
+  stage: test-acceptation
   script:
-    - docker rmi -f staticapp || echo "image already deleted" 
+    - docker info  # Vérifiez si le démon Docker est disponible
+    - docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
     - docker load < staticapp.tar
-    - docker rm -vf staticapp-test || echo "container already cleaned"
+    - docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
     - docker run -d -p 80:80 -e PORT=80 --name staticapp-test staticapp
     - sleep 5
     - apk --no-cache add curl
-    - curl "http://docker-vm" | grep  "Hello world!"
-    - docker rm -vf staticapp-test && echo "clean container"
+    - curl "http://docker-vm" | grep "Hello world!"
+    - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
