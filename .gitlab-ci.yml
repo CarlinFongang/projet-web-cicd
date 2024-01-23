@@ -4,18 +4,18 @@ services:
     alias: docker-vm    
 
 stages:
-  - build
+  - Build
   - Test acceptation
 
 docker-build:
-  stage: build
+  stage: Build
   script:
-  - docker build -t staticapp .
-  - docker save staticapp > staticapp.tar
+    - docker build -t staticapp .
+    - docker save staticapp > staticapp.tar
   
 artifacts:
-    paths:
-      - staticapp.tar  
+  paths:
+    - staticapp.tar  
 
 test acceptation:
   stage: Test acceptation
