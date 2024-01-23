@@ -14,7 +14,11 @@ RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/w
 #RUN git clone https://github.com/CarlinFongang/cursus-devops.git .
 
 # Expose le port 80
-EXPOSE 80
+#EXPOSE 80
+
+RUN adduser -D myuser
+USER myuser
 
 # Démarre Nginx
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi 
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
