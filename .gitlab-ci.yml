@@ -25,5 +25,5 @@ test acceptation:
     - docker run -d -p 8090:80 -e PORT=80 --name staticapp-test staticapp
     - sleep 5
     - apk --no-cache add curl
-    - curl "http://docker-vm" | grep  "Hello world!"
+    - curl "http://docker-vm:8090" | grep  "Hello world!"
     - docker rm -vf staticapp-test && echo "clean container"
