@@ -1,10 +1,30 @@
-docker-build: # Create a new job.
-# Use the official docker image.
-  image: docker:latest
+image: docker:latest
+services:
+  - name: docker:dind
+    alias: docker-vm    
+
+stages:
+  - build
+  - Test acceptation
+
+docker-build:
   stage: build
-  #tags:
-  #  - carlinfg  # Ajoutez du tag du runner privé à utiliser
-  services:
-    - docker:dind
   script:
-    - docker build -t staticapp .
+  - docker build -t staticapp .
+  - docker save staticapp > staticapp.tar
+  
+artifacts:
+    paths:
+      - staticapp.tar  
+
+test acceptation:
+  stage: Test acceptation
+  script:
+    - docker rmi -f staticapp || echo "image already deleted" 
+    - docker load < staticapp.tar
+    - docker rm -vf staticapp-test || echo "container already cleaned"
+    - docker run -d -p 8090:80 -e PORT=80 --name staticapp-test staticapp
+    - sleep 5
+    - apk --no-cache add curl
+    - curl "http://docker-vm" | grep  "Hello world!"
+    - docker rm -vf staticapp-test && echo "clean container"
