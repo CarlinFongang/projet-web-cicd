@@ -32,6 +32,6 @@ test-acceptation:
     - sleep 5
     #- docker ps
     - docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test
-    #- apk --no-cache add curl
-    #- curl "http://staticapp" | grep "DIMENSION"
+    - apk --no-cache add curl
+    - curl "http://staticapp" | grep "DIMENSION"
     #- docker rm -vf staticapp-test && echo "Conteneur nettoyé"
