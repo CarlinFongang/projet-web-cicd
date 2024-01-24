@@ -15,10 +15,10 @@ docker-build:
   stage: build
   script:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker save $CI_REGISTRY_IMAGE > $CI_REGISTRY_IMAGE.tar
+    - docker save $CI_REGISTRY_IMAGE > staticapp.tar
   artifacts:
     paths:
-      - $CI_REGISTRY_IMAGE.tar 
+      - staticapp.tar 
 
 test-acceptation:
   stage: test-acceptation
