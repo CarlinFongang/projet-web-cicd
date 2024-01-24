@@ -28,10 +28,12 @@ test-acceptation:
     - docker load < staticapp.tar
     #- docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
     #- docker run -d -p 80:80 -e PORT=80 --name staticapp-test1 staticapp
-    - docker run -it -d -p 80:80 --name staticapp-test staticapp:latest /bin/bash
+    - docker run -d -p 80:80 --name staticapp-test staticapp:latest
     - sleep 5
     #- docker ps
-    - docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test
     - apk --no-cache add curl
-    - curl "http://staticapp" | grep "DIMENSION"
-    #- docker rm -vf staticapp-test && echo "Conteneur nettoyé"
+    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
+    - echo "Adresse IP du conteneur : $ip_address"
+    - curl "http://$ip_address:80" | grep "DIMENSION"
+    #- curl "/var/www/html/" | grep "DIMENSION"
+    - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
