@@ -15,7 +15,7 @@ RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/w
 #ADD static-website-example/ /var/www/html/
 
 # Expose le port 80
-#EXPOSE 80
+EXPOSE 80
 
 # Démarre Nginx
 #CMD gunicorn --bind 0.0.0.0:$PORT wsgi 
