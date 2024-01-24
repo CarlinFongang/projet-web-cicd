@@ -27,12 +27,14 @@ test-acceptation:
     #- docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
     - docker load < staticapp.tar
     #- docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
-    #- docker run -d -p 80:80 -e PORT=80 --name staticapp-test1 staticapp
     - docker run -d -p 8090:80 --name staticapp-test staticapp:latest
     - sleep 5
-    #- docker ps
     - apk --no-cache add curl
-    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
+    # Exécute la commande docker ps pour obtenir l'ID du conteneur
+    - container_id=$(docker ps -f "name=staticapp-test" --format "{{.ID}}")
+    # Affiche l'ID du conteneur stocké dans la variable
+    - echo "ID du conteneur  $container_id"
+    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_id)
     - echo "Adresse IP du conteneur  $ip_address"
     - curl "http://$ip_address:80" | grep "DIMENSION"
     #- curl "/var/www/html/" | grep "DIMENSION"
