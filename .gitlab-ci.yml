@@ -29,6 +29,6 @@ test-acceptation:
     - docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
     - docker run -d -p 8090:80 -e PORT=80 --name staticapp-test1 staticapp
     - sleep 5
-    - apt-get install -y curl
+    #- apt-get install -y curl
     - curl "http://docker-vm" | grep "Welcome"
     - docker rm -vf staticapp-test && echo "Conteneur nettoyé"

@@ -6,6 +6,7 @@ WORKDIR /var/www/html/
 
 # Installe Nginx et Git
 RUN apt-get update && \
+    apt-get install -y curl &&\
     apt-get install -y nginx git && \
     rm -rf /var/www/html/*
 
