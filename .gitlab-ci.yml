@@ -13,34 +13,26 @@ before_script:
 
 docker-build:
   stage: build
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t -f "$CI_REGISTRY_IMAGE" Dockerfile .
-    - docker push "$CI_REGISTRY_IMAGE"
-    - docker save "$CI_REGISTRY_IMAGE" > $CI_REGISTRY_IMAGE.tar
+    - docker build -t staticapp .
+    - docker save staticapp > staticapp.tar
   artifacts:
     paths:
-      - $CI_REGISTRY_IMAGE.tar 
+      - staticapp.tar 
 
 test-acceptation:
   stage: test-acceptation
   script:
     #- docker info  # Vérifiez si le démon Docker est disponible
     #- docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
-    - docker load < $CI_REGISTRY_IMAGE.tar
+    - docker load < staticapp.tar
     #- docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
-    - docker run -d --name $CI_REGISTRY_IMAGE-test $CI_REGISTRY_IMAGE:latest # -p 8090:80
+    #- docker run -d -p 80:80 -e PORT=80 --name staticapp-test1 staticapp
+    - docker run -d -p 80:80 --name staticapp-test staticapp:latest
     - sleep 5
+    #- docker ps
     - apk --no-cache add curl
-    # Exécute la commande docker ps pour obtenir l'ID du conteneur
-    - container_id=$(docker ps -f "name=$CI_REGISTRY_IMAGE-test" --format "{{.ID}}")
-    # Affiche l'ID du conteneur stocké dans la variable
-    - echo "ID du conteneur  $container_id"
-    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $container_id)
+    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - echo "Adresse IP du conteneur  $ip_address"
-    - curl "http://$ip_address" | grep "DIMENSION"
-    #- curl "/var/www/html/" | grep "DIMENSION"
-    - docker rm -vf $CI_REGISTRY_IMAGE-test && echo "Conteneur nettoyé"
+    - curl -i "http://$ip_address" | grep "DIMENSION"
+    - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
