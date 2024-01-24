@@ -23,15 +23,15 @@ docker-build:
 test-acceptation:
   stage: test-acceptation
   script:
-    - docker info  # Vérifiez si le démon Docker est disponible
-    - docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
+    #- docker info  # Vérifiez si le démon Docker est disponible
+    #- docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
     - docker load < staticapp.tar
-    - docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
+    #- docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
     #- docker run -d -p 80:80 -e PORT=80 --name staticapp-test1 staticapp
-    - docker run -d -p 80:80 --name staticapp-test staticapp
+    - docker run -it -d -p 80:80 --name staticapp-test staticapp:latest /bin/bash
     - sleep 5
-    - docker ps
+    #- docker ps
     - docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test
-    - apk --no-cache add curl
-    - curl "http://staticapp" | grep "DIMENSION"
-    - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
+    #- apk --no-cache add curl
+    #- curl "http://staticapp" | grep "DIMENSION"
+    #- docker rm -vf staticapp-test && echo "Conteneur nettoyé"

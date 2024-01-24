@@ -18,5 +18,5 @@ RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/w
 #EXPOSE 80
 
 # Démarre Nginx
-CMD gunicorn --bind 0.0.0.0:$PORT wsgi 
+#CMD gunicorn --bind 0.0.0.0:$PORT wsgi 
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
