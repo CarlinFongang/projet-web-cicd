@@ -34,5 +34,5 @@ test-acceptation:
     - apk --no-cache add curl
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - echo "Adresse IP du conteneur  $ip_address"
-    - grep -i "http://staticapp" | grep "DIMENSION"
+    - curl "http://staticapp" | grep -i "DIMENSION"
     - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
