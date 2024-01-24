@@ -14,11 +14,11 @@ before_script:
 docker-build:
   stage: build
   script:
-    - docker build -t staticapp .
-    - docker save staticapp > staticapp.tar
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" -f .
+    - docker save $CI_REGISTRY_IMAGE > $CI_REGISTRY_IMAGE.tar
   artifacts:
     paths:
-      - staticapp.tar 
+      - $CI_REGISTRY_IMAGE.tar 
 
 test-acceptation:
   stage: test-acceptation
@@ -36,3 +36,4 @@ test-acceptation:
     - echo "Adresse IP du conteneur  $ip_address"
     - curl "http://staticapp" | grep -i "DIMENSION"
     - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
+
