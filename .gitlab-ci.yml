@@ -30,6 +30,6 @@ test-acceptation:
     - docker run -d -p 80:80 -e PORT=80 --name staticapp-test staticapp
     - sleep 5
     - install curl
-    - apt install curl -y
+    - apt install -y curl
     - curl "http://docker-vm" | grep "Welcome"
     - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
