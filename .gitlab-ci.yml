@@ -20,7 +20,7 @@ docker-build:
     paths:
       - staticapp.tar 
 
-.test-acceptation:
+test-acceptation:
   stage: test-acceptation
   script:
     - docker info  # Vérifiez si le démon Docker est disponible
