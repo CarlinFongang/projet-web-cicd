@@ -27,8 +27,8 @@ test-acceptation:
     - docker rmi -f staticapp 2>/dev/null || echo "Image déjà supprimée" 
     - docker load < staticapp.tar
     - docker rm -vf staticapp-test 2>/dev/null || echo "Conteneur déjà nettoyé"
-    - docker run -d -p 80:80 -e PORT=80 --name staticapp-test staticapp
+    - docker run -d -p 8090:80 -e PORT=80 --name staticapp-test1 staticapp
     - sleep 5
-    - apt install -y curl
+    - apt-get install -y curl
     - curl "http://docker-vm" | grep "Welcome"
     - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
