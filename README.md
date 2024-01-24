@@ -1,4 +1,6 @@
 
+![Alt text](image-3.png)
+![Alt text](image-2.png)
 
 ## Setting of build stage 
 dans cette étape, je fait appel directement au code depuis le repo distance 
