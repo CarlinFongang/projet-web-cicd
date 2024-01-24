@@ -14,7 +14,7 @@ before_script:
 docker-build:
   stage: build
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" -f .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
     - docker save $CI_REGISTRY_IMAGE > $CI_REGISTRY_IMAGE.tar
   artifacts:
     paths:
