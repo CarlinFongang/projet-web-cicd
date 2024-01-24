@@ -11,8 +11,8 @@ RUN apt-get update && \
     rm -rf /var/www/html/*
 
 # Clone le dépôt Git
-RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/www/html
-#RUN git clone https://github.com/CarlinFongang/cursus-devops.git .
+#RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/www/html
+ADD static-website-example/ /var/www/html/
 
 # Expose le port 80
 #EXPOSE 80
