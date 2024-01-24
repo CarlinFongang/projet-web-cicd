@@ -34,7 +34,7 @@ test-acceptation:
     - container_id=$(docker ps -f "name=staticapp-test" --format "{{.ID}}")
     # Affiche l'ID du conteneur stocké dans la variable
     - echo "ID du conteneur  $container_id"
-    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_id)
+    - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $container_id)
     - echo "Adresse IP du conteneur  $ip_address"
     - curl "http://$ip_address:80" | grep "DIMENSION"
     #- curl "/var/www/html/" | grep "DIMENSION"
