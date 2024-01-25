@@ -192,25 +192,47 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 
 ## deploy review stage
 ### Description 
-
+Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge_requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de npm, la configuration de l'accès au registre Heroku, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion ou de l'abandon de la demande de fusion.
 >![Alt text](image-17.png)
 *script du stage deploy review*
 
-### Explication
 
+### Explications du script
+1. `apk --no-cache add npm`: Installe le gestionnaire de paquets npm nécessaire pour les dépendances du projet.
+
+2. `npm install -g heroku`: Installe l'outil de ligne de commande Heroku de manière globale pour faciliter les opérations Heroku.
+
+3. `heroku container:login`: Authentifie l'utilisateur sur le registre de conteneurs Heroku, permettant ainsi le déploiement ultérieur.
+
+4. `APP_NAME=staticapp-$CI_COMMIT_REF_NAME`: Définit le nom de l'application Heroku en fonction de la branche actuelle.
+
+5. `[[ ${#APP_NAME} -gt 31 ]]` && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
+
+6. `heroku create $APP_NAME || echo "project already exist"`: Crée l'application Heroku avec le nom défini précédemment, en évitant une erreur si le projet existe déjà.
+
+7. `heroku container:push -a $APP_NAME web`: Pousse les images de conteneurs vers l'application Heroku créée, prêtes pour le déploiement.
+
+8. `heroku container:release -a $APP_NAME web`: Met en production l'application sur Heroku en publiant les conteneurs précédemment poussés.
 
 ### setup (variable)
 `Settings > CICD > Variables\`
-![Alt text](image-18.png)
+>![Alt text](image-18.png)
 *setting variables*
 
+#### How to setup link heroku
+<p align="center">
+visit this link to setup heroku API ant url link for you gitlab account
+  <a href="https://gitlab.com/CarlinFongang/lab4-deployment" alt="Crédit : Carlin FONGANG" >
+  </a>
+</p>
 
 ### Rendu
 
 
 
 
-## deploy review stage
+
+## stop review stage
 ### Description 
 
 ### Explication
