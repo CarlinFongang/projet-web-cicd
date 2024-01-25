@@ -74,7 +74,7 @@ stop-review:
   when: manual
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    action: stop #ajout de l'action stop pour l'arret de l'environnement review
+    action: stop #ajout de l'action stop pour la supp de l'environnement review
   script:
     - apk --no-cache add npm
     - npm install -g heroku
