@@ -21,6 +21,8 @@ docker-build:
   artifacts:
     paths:
       - staticapp.tar #sauvergarde de rendu du build sour forme d'artifact
+  tags:
+    - carlinfg
 
 test-acceptation:
   stage: Test acceptation
@@ -32,6 +34,8 @@ test-acceptation:
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - curl "http://staticapp" | grep -i "DIMENSION"
     - echo "Adresse IP du conteneur  $ip_address"
+  tags:
+    - carlinfg
 
 
 release-image:
@@ -45,6 +49,8 @@ release-image:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+  tags:
+    - carlinfg
 
 deploy-review:
   stage: Deploy review
@@ -61,10 +67,10 @@ deploy-review:
     - echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com #
     # Pull de l'image depuis le registry GitLab
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME #
-    # Tag de l'image pour le déploiement sur Heroku
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME registry.heroku.com/$APP_NAME/web #
     #- heroku container:login
     - APP_NAME=staticapp-$CI_COMMIT_REF_NAME
+    # Tag de l'image pour le déploiement sur Heroku
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME registry.heroku.com/$APP_NAME/web #
     - "[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1"
     # Push de l'image taggée vers le registre Heroku
     - docker push registry.heroku.com/$APP_NAME/web #
@@ -75,6 +81,8 @@ deploy-review:
     #- heroku create $APP_NAME || echo "project already exist"
     #- heroku container:push -a $APP_NAME web
     #- heroku container:release -a $APP_NAME web
+  tags:
+    - carlinfg
 
 stop-review:
   stage: Stop review
@@ -91,3 +99,5 @@ stop-review:
     - npm install -g heroku
     - heroku container:login
     - heroku apps:destroy -a staticapp-$CI_COMMIT_REF_NAME --confirm staticapp-$CI_COMMIT_REF_NAME
+  tags:
+    - carlinfg
