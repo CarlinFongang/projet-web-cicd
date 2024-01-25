@@ -15,14 +15,15 @@ stages:
 
 docker-build:
   stage: Build
+  tags:
+    - carlinfg
   script:
     - docker build --pull -t staticapp .
     - docker save staticapp > staticapp.tar
   artifacts:
     paths:
       - staticapp.tar #sauvergarde de rendu du build sour forme d'artifact
-  tags:
-    - carlinfg
+
 
 test-acceptation:
   stage: Test acceptation
