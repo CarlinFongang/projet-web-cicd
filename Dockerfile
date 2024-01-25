@@ -1,4 +1,3 @@
-ARG version="latest"
 FROM ubuntu:18.04
 LABEL maintainer="Carlinfg <fongangcarlin@gmail.com>"
 
