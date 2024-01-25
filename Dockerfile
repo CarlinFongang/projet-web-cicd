@@ -1,3 +1,4 @@
+ARG version="latest"
 FROM ubuntu:18.04
 LABEL maintainer="Carlinfg <fongangcarlin@gmail.com>"
 
@@ -12,7 +13,6 @@ RUN apt-get update && \
 
 # Clone le dépôt Git
 RUN git clone https://github.com/CarlinFongang/static-website-example.git /var/www/html
-#ADD static-website-example/ /var/www/html/
 
 # Expose le port 80
 EXPOSE 80

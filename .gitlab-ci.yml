@@ -1,5 +1,4 @@
 image: docker:latest
-
 services:
   - name: docker:dind
     alias: staticapp    
@@ -9,8 +8,8 @@ stages:
   - test-acceptation
   - Release image
 
-before_script:
-  - docker info
+#before_script:
+#  - docker info
 
 docker-build:
   stage: build
@@ -19,7 +18,7 @@ docker-build:
     - docker save staticapp > staticapp.tar
   artifacts:
     paths:
-      - staticapp.tar 
+      - staticapp.tar #sauvergarde de rendu du build sour forme d'artifact
 
 test-acceptation:
   stage: test-acceptation
@@ -29,9 +28,9 @@ test-acceptation:
     - sleep 5
     - apk --no-cache add curl
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
-    - echo "Adresse IP du conteneur  $ip_address"
     - curl "http://staticapp" | grep -i "DIMENSION"
-    - docker rm -vf staticapp-test && echo "Conteneur nettoyé"
+    - echo "Adresse IP du conteneur  $ip_address"
+
 
 release image:
   stage: Release image
