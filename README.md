@@ -20,7 +20,7 @@ Email : fongangcarlin@gmail.com
 LinkedIn : https://www.linkedin.com/in/carlinfongang/
 
 _______
-# Documenting my experiments with Gitlab CI to deploy a Dockerized html application.
+## Documenting my experiments with Gitlab CI to deploy a Dockerized html application.
 ![Alt text](image-3.png)
 
 ## Architecture
@@ -62,7 +62,7 @@ Ce Dockerfile définit les étapes nécessaires pour créer une image Docker bas
 2. Ajoute une étiquette (label) "maintainer" avec l'adresse e-mail de l'auteur.
 3. Définit le répertoire de travail actuel à /var/www/html/.
 4. Met à jour les paquets, installe `Curl, Nginx et Git`, puis supprime le contenu existant dans `/var/www/html/`.
-5. Clone le dépôt Git `https://github.com/CarlinFongang/static-website-example.git` dans /var/www/html.
+5. Clone le dépôt Git `https://github.com/CarlinFongang/static-website-example.git` dans `/var/www/html`.
 6. Expose le port 80 pour les connexions externes.
 7. Configure l'entrée principale pour démarrer Nginx en mode démon (daemon).
 
@@ -80,7 +80,7 @@ cd projet-web-cicd
 git remote add origin git@gitlab.com:user_name_on_gitlab/projet-web-cicd.git 
 git add . 
 git commit -m "Initial Commit" 
-git push -u origin main
+git push --set-upstream origin main
 ````
 
 ### 3. Créez un fichier .gitlab-ci.yml
@@ -106,12 +106,24 @@ Il y a un total de 9 étapes dans notre processus de fabrication de pipeline. D�
 dans cette étape, je fait appel directement au code depuis le repo distance 
 dans le stage  docker-build, nous utilisons une image Docker pour créer une autre image Docker, vous pouvez donc voir que nous avons utilisé l'image docker:latest et comme service docker:dind.
 Une fois l'image buildé, nous allons gardé le produit de cette phase sous forme d'artifact pour un usage ultérieur 
-![Alt text](image-8.png)
->![Alt text Réalisation du build dans le pipeline CI/CD](image.png)
+>![Alt text](image-8.png)
+*stage build dans le gitlab-ci*
+>![Alt text](image.png)
+*build dans le pipeline CI/CD*
 
 
 
 
-## Launc "test d'acceptation"
+## Launch "test d'acceptation"
+Dans le stage "test-acceptation", l'image Docker "staticapp" produit à la phase de build est chargée, et un conteneur temporaire nommé "staticapp-test" est créé à partir de cette image. Le conteneur tourne en arrière-plan sur le port 80. Un délai de 5 secondes est introduit pour permettre au conteneur de s'initialiser. Ensuite, l'utilitaire Curl est installé pour effectuer des requêtes HTTP. L'adresse IP du conteneur est obtenue à l'aide de la commande Docker inspect. 
+
+Une requête HTTP est effectuée sur le conteneur pour vérifier la présence de la chaîne "DIMENSION". Enfin, l'adresse IP du conteneur est affichée en sortie. Ce stage vise à tester et à valider le fonctionnement de l'application statique dans un environnement isolé.
+![Alt text](image-9.png)
+
+### Résultats
 >![Alt text](image-1.png)
+*job test_acceptation*
+>![Alt text](image-10.png)
+*Retour vérifiée de la requette curl*
+
 
