@@ -190,7 +190,7 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 ### Description 
 Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge_requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de npm, la configuration de l'accès au registre Heroku, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion ou de l'abandon de la demande de fusion.
 >![Alt text](image-17.png)
-*script du stage deploy review*
+*script du stage "deploy review"*
 
 
 ### Explications du script
@@ -217,6 +217,16 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 #### How to setup link heroku
 [visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
+
+### Setup a new branch in a same project
+1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
+2. Se placer sur cette nouvelle branche, et raliser un commit
+3. Effectuer ensuite un merge request pour déclencher l'exécution du stage "Deploy review"
+![Alt text](image-19.png)
+*exécution du merge_request*
+
+![Alt text](image-20.png)
+*lancement du "Deploy review"*
 
 
 ### Rendu
