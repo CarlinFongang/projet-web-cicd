@@ -54,7 +54,7 @@ deploy-review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: ${REVIEW_LINK}
-    on_stop: stop review
+    on_stop: Stop review
   script:
     - apk --no-cache add npm
     - npm install -g heroku
