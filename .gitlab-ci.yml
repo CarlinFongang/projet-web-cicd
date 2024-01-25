@@ -35,6 +35,7 @@ test-acceptation:
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - curl "http://staticapp" | grep -i "DIMENSION"
     - echo "Adresse IP du conteneur  $ip_address"
+    - docker rm -vf staticapp-test && echo "clean container"
   tags:
     - carlinfg
 
