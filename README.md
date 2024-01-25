@@ -1,10 +1,6 @@
 # Gitlab-CI | Automate deploying a Dockerized basic web application with Gitlab CI and AWS
 
-<p align="center">
-Please find the specifications by clicking
-  <a href="https://github.com/eazytraining/gitlab-ci-training/tree/2ea9e36e03909e19ceb2fae2d9d950b3dc8546e8/TPs%20Heroku/TP6%20-%20Test%20de%20validation" alt="Crédit : eazytraining.fr" >
-  </a>
-</p>
+[Please find the specifications by clicking](https://github.com/eazytraining/gitlab-ci-training/tree/2ea9e36e03909e19ceb2fae2d9d950b3dc8546e8/TPs%20Heroku/TP6%20-%20Test%20de%20validation")
 
 ------------
 
@@ -220,11 +216,8 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 *setting variables*
 
 #### How to setup link heroku
-<p align="center">
-visit this link to setup heroku API ant url link for you gitlab account
-  <a href="https://gitlab.com/CarlinFongang/lab4-deployment" alt="Crédit : Carlin FONGANG" >
-  </a>
-</p>
+[visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
+
 
 ### Rendu
 
