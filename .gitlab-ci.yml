@@ -63,7 +63,6 @@ deploy-review:
     - heroku create $APP_NAME || echo "project already exist"
     - heroku container:push -a $APP_NAME web
     - heroku container:release -a $APP_NAME web
-    - heroku logs --tail
 
 stop-review:
   stage: Stop review
