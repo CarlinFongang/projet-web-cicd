@@ -86,7 +86,8 @@ git push --set-upstream origin main
 ### 3. Créez un fichier .gitlab-ci.yml
 Créez un fichier caché .gitlab-ci.yml et placez-le dans la repertoire racine du projet. Ceci est nécessaire pour que gitlab récupère et configure le pipeline. Une fois que gitlab aura détecté ce fichier, il attribuera des runners pour exécuter votre pipeline. Le contenu du gitlab-ci.yml est le suivant.
 ````
-$PWD\projet-web-cicd\.gitlab-ci.yml
+cd projet-web-cicd\
+cat .gitlab-ci.yml
 ````
 >![Alt text](image-7.png)
 
@@ -124,7 +125,7 @@ Une fois l'image buildé, nous allons gardé le produit de cette phase sous form
 >![Alt text](image-16.png)
 
 
-Build > Artifacts
+>Build > Artifacts
 >![Alt text](image-15.png)
 *Artifact staticapp.tar*
 
@@ -184,7 +185,36 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 >![Alt text](image-13.png)
 *Bon déroulement du job release*
 
-### Sauvegarde de la release
-Deploy > Container Registry > projet-web-cicd
+#### Sauvegarde de la release
+>Deploy > Container Registry > projet-web-cicd
 >![Alt text](image-14.png)
 
+
+## deploy review stage
+### Description 
+
+>![Alt text](image-17.png)
+*script du stage deploy review*
+
+### Explication
+
+
+### setup (variable)
+`Settings > CICD > Variables\`
+![Alt text](image-18.png)
+*setting variables*
+
+
+### Rendu
+
+
+
+
+## deploy review stage
+### Description 
+
+### Explication
+
+### setup (variable)
+
+### Rendu

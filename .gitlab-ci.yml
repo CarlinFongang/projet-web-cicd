@@ -4,15 +4,17 @@ services:
     alias: staticapp    
 
 stages:
-  - build
+  - Build
   - test-acceptation
   - Release image
+  - Deploy review 
+  - Stop review 
 
 #before_script:
 #  - docker info
 
 docker-build:
-  stage: build
+  stage: Build
   script:
     - docker build --pull -t staticapp .
     - docker save staticapp > staticapp.tar
@@ -21,7 +23,7 @@ docker-build:
       - staticapp.tar #sauvergarde de rendu du build sour forme d'artifact
 
 test-acceptation:
-  stage: test-acceptation
+  stage: Test-acceptation
   script:
     - docker load < staticapp.tar
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
@@ -44,3 +46,37 @@ release image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
+
+deploy review:
+  stage: Deploy review
+  only:
+    - merge_requests
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: ${REVIEW_LINK}
+    on_stop: stop review
+  script:
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - APP_NAME=staticapp-$CI_COMMIT_REF_NAME
+    - "[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1"
+    - heroku create $APP_NAME || echo "project already exist"
+    - heroku container:push -a $APP_NAME web
+    - heroku container:release -a $APP_NAME web
+   
+stop review:
+  stage: Stop review
+  variables:
+    GIT_STRATEGY: none
+  only:
+    - merge_requests
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop #ajout de l'action stop pour l'arret de l'environnement review
+  script:
+    - apk --no-cache add npm
+    - npm install -g heroku
+    - heroku container:login
+    - heroku apps:destroy -a staticapp-$CI_COMMIT_REF_NAME --confirm staticapp-$CI_COMMIT_REF_NAME
