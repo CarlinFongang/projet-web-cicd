@@ -202,7 +202,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 4. `APP_NAME=staticapp-$CI_COMMIT_REF_NAME`: Définit le nom de l'application Heroku en fonction de la branche actuelle.
 
-5. `[[ ${#APP_NAME} -gt 31 ]]` && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
+5. `[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1`: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
 
 6. `heroku create $APP_NAME || echo "project already exist"`: Crée l'application Heroku avec le nom défini précédemment, en évitant une erreur si le projet existe déjà.
 
@@ -222,15 +222,15 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
 2. Se placer sur cette nouvelle branche, et raliser un commit
 3. Effectuer ensuite un merge request pour déclencher l'exécution du stage "Deploy review"
-![Alt text](image-19.png)
+>![Alt text](image-19.png)
 *exécution du merge_request*
 
-![Alt text](image-20.png)
+>![Alt text](image-20.png)
 *lancement du "Deploy review"*
 
 
 ### Rendu
-
+>![Alt text](image-21.png)
 
 
 
