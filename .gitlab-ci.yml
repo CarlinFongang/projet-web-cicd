@@ -5,7 +5,7 @@ services:
 
 stages:
   - Build
-  - test-acceptation
+  - Test acceptation
   - Release image
   - Deploy review 
   - Stop review 
@@ -23,7 +23,7 @@ docker-build:
       - staticapp.tar #sauvergarde de rendu du build sour forme d'artifact
 
 test-acceptation:
-  stage: Test-acceptation
+  stage: Test acceptation
   script:
     - docker load < staticapp.tar
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
@@ -34,7 +34,7 @@ test-acceptation:
     - echo "Adresse IP du conteneur  $ip_address"
 
 
-release image:
+release-image:
   stage: Release image
   script: 
     - docker load < staticapp.tar
@@ -47,7 +47,7 @@ release image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 
-deploy review:
+deploy-review:
   stage: Deploy review
   only:
     - merge_requests
@@ -65,7 +65,7 @@ deploy review:
     - heroku container:push -a $APP_NAME web
     - heroku container:release -a $APP_NAME web
    
-stop review:
+stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
