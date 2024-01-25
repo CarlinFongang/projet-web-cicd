@@ -62,16 +62,16 @@ deploy-review:
     # Pull de l'image depuis le registry GitLab
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME #
     # Tag de l'image pour le déploiement sur Heroku
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME registry.heroku.com/$HEROKU_APP_NAME/web #
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME registry.heroku.com/$APP_NAME/web #
     #- heroku container:login
     - APP_NAME=staticapp-$CI_COMMIT_REF_NAME
     - "[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1"
     # Push de l'image taggée vers le registre Heroku
     - docker push registry.heroku.com/$APP_NAME/web #
     # Déploiement de l'image sur Heroku
-    - docker container stop $(docker container ls -q --filter "ancestor=registry.heroku.com/$HEROKU_APP_NAME/web")
-    - docker container rm $(docker container ls -q --filter "ancestor=registry.heroku.com/$HEROKU_APP_NAME/web")
-    - heroku container:release web --app $HEROKU_APP_NAME
+    - docker container stop $(docker container ls -q --filter "ancestor=registry.heroku.com/$APP_NAME/web")
+    - docker container rm $(docker container ls -q --filter "ancestor=registry.heroku.com/$APP_NAME/web")
+    - heroku container:release web --app $APP_NAME
     #- heroku create $APP_NAME || echo "project already exist"
     #- heroku container:push -a $APP_NAME web
     #- heroku container:release -a $APP_NAME web
