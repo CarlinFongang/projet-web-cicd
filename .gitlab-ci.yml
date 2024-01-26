@@ -29,6 +29,7 @@ test-acceptation:
   stage: Test acceptation
   script:
     - docker load < staticapp.tar
+    - docker rm -f staticapp-test >/dev/null 2>&1 && echo "Conteneur précédent supprimé." || echo "Aucun conteneur du même nom n'exite."
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
     - sleep 5
     - apk --no-cache add curl
