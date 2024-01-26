@@ -28,6 +28,7 @@ docker-build:
 test-acceptation:
   stage: Test acceptation
   script:
+    - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédent supprimé." || echo "Aucune image du même nom n'exite."
     - docker load < staticapp.tar
     - docker rm -f staticapp-test >/dev/null 2>&1 && echo "Conteneur précédent supprimé." || echo "Aucun conteneur du même nom n'exite."
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
