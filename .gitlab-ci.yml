@@ -1,7 +1,7 @@
 image: docker:latest
 services:
   - name: docker:dind
-    alias: staticapp    
+    alias: staticapp
 
 stages:
   - Build
@@ -28,7 +28,7 @@ docker-build:
 test-acceptation:
   stage: Test acceptation
   script:
-    - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédent supprimé." || echo "Aucune image du même nom n'exite."
+    - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédente supprimé." || echo "Aucune image du même nom n'exite."
     - docker load < staticapp.tar
     - docker rm -f staticapp-test >/dev/null 2>&1 && echo "Conteneur précédent supprimé." || echo "Aucun conteneur du même nom n'exite."
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
@@ -68,24 +68,12 @@ deploy-review:
   script:
     - apk --no-cache add npm
     - npm install -g heroku
-    # Authentification sur le registre Heroku
-    - echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com #
-    # Pull de l'image depuis le registry GitLab
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME #
-    #- heroku container:login
+    - heroku container:login
     - APP_NAME=staticapp-$CI_COMMIT_REF_NAME
-    # Tag de l'image pour le déploiement sur Heroku
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME registry.heroku.com/$APP_NAME/web #
     - "[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1"
-    # Push de l'image taggée vers le registre Heroku
-    - docker push registry.heroku.com/$APP_NAME/web #
-    # Déploiement de l'image sur Heroku
-    - docker container stop $(docker container ls -q --filter "ancestor=registry.heroku.com/$APP_NAME/web")
-    - docker container rm $(docker container ls -q --filter "ancestor=registry.heroku.com/$APP_NAME/web")
-    - heroku container:release web --app $APP_NAME
-    #- heroku create $APP_NAME || echo "project already exist"
-    #- heroku container:push -a $APP_NAME web
-    #- heroku container:release -a $APP_NAME web
+    - heroku create $APP_NAME || echo "project already exist"
+    - heroku container:push -a $APP_NAME web
+    - heroku container:release -a $APP_NAME web
   tags:
     - carlinfg
 
