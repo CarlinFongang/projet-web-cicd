@@ -15,6 +15,8 @@ stages:
 
 docker-build:
   stage: Build
+  tags:
+    - carlinfg
   script:
     - docker build --pull -t staticapp .
     - docker save staticapp > staticapp.tar
@@ -25,17 +27,24 @@ docker-build:
 test-acceptation:
   stage: Test acceptation
   script:
+    - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédente supprimé." || echo "Aucune image du même nom n'exite."
     - docker load < staticapp.tar
-    - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
+    - docker rm -f staticapp-test >/dev/null 2>&1 && echo "Conteneur précédent supprimé." || echo "Aucun conteneur du même nom n'exite."
+    - docker run --rm -dp 80:80 --name staticapp-test staticapp:latest
     - sleep 5
     - apk --no-cache add curl
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - curl "http://staticapp" | grep -i "DIMENSION"
     - echo "Adresse IP du conteneur  $ip_address"
+    - docker rm -vf staticapp-test && echo "clean container"
+  tags:
+    - carlinfg
 
 
 release-image:
   stage: Release image
+  tags:
+    - carlinfg
   script: 
     - docker load < staticapp.tar
     #ajout des variable d'environnement permettant de tagger la release
@@ -49,6 +58,8 @@ release-image:
 
 deploy-review:
   stage: Deploy review
+  tags:
+    - carlinfg
   only:
     - merge_requests
   environment:
@@ -67,6 +78,8 @@ deploy-review:
    
 stop-review:
   stage: Stop review
+  tags:
+    - carlinfg
   variables:
     GIT_STRATEGY: none
   only:
