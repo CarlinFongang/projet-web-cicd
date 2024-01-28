@@ -10,10 +10,22 @@ stages:
   - Deploy review 
   - Stop review 
   - Deploy staging
+  - Test staging
+
 
 variables:
   SERVER_USER: ubuntu
   SERVER_IP: 54.90.253.3 #Public IP address EC2 on AWS
+
+.test_template: &test
+  image: alpine
+  only:
+   - main
+  script:
+   - apk --no-cache add curl
+   - curl "http://$DOMAIN" | grep -i "dimension"
+  #environment:
+   #url: "https://$DOMAIN"
 
 docker-build:
   stage: Build
@@ -27,7 +39,7 @@ docker-build:
       - staticapp.tar
 
 
-test-acceptation:
+.test-acceptation:
   stage: Test acceptation
   script:
     - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédente supprimé." || echo "Aucune image du même nom n'exite."
@@ -57,7 +69,7 @@ release-image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 
-deploy-review: #review effectué sur un Dyno service de Heroku
+.deploy-review: #review effectué sur un Dyno service de Heroku
   stage: Deploy review
   only:
     - merge_requests
@@ -76,7 +88,7 @@ deploy-review: #review effectué sur un Dyno service de Heroku
     - heroku container:release -a $APP_NAME web
 
 
-stop-review:
+.stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
@@ -107,3 +119,9 @@ deploy staging: #déployment effectué sur une instance ec2 de aws
     url: http://$SERVER_IP
   only:
     - main
+
+test staging:
+  <<: *test
+  stage: Test staging
+  variables:
+    DOMAIN: http://$SERVER_IP

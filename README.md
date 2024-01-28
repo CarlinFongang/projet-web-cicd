@@ -265,10 +265,54 @@ Ce stage est destiné à interrompre les environnements de révision associés a
 >![Alt text](image-25.png)
 *Validation manuelle de la merge request*
 
-![Alt text](image-27.png)
+>![Alt text](image-27.png)
 *Job successfull*
 
-![Alt text](image-28.png)
+>![Alt text](image-28.png)
 *Suppression de l'environnement staticapp-new-feats*
 
+
+
+## deploy staging
+### Description 
+Le script "deploy staging" orchestre le déploiement de l'application static-webapp, basé sur l'image staticapp sur une instance EC2 AWS, représentant l'environnement de staging. L'image Docker de base utilise est Alpine, il met à jour les paquets et installe le client SSH. En utilisant SSH, il se connecte à l'instance EC2 avec les clés d'identification fournies et effectue plusieurs actions : il se connecte au registre Docker GitLab CI/CD pour télécharger l'image Docker associée à la branche actuelle (main), supprime un éventuel conteneur existant portant le nom "static-webapp" qui aurai été déployé précédement, puis lance un nouveau conteneur Docker à partir de l'image téléchargée. L'environnement "staging" est défini pour cette instance, avec une URL donnée, et le déploiement est limité à la branche principale ("main").
+
+>![Alt text](image-29.png)
+>![Alt text](image-30.png)
+
+### Explications du script
+1. `deploy staging`: : Définit le nom du job de déploiement comme "deploy staging".
+2. image: alpine:latest : Spécifie l'image Docker à utiliser pour exécuter le job, dans ce cas, Alpine Linux.
+3. stage: Deploy staging : Indique le stade de déploiement dans le pipeline GitLab, ici "Deploy staging".
+4. script: 
+  - chmod og= $ID_RSA : Ajuste les permissions du fichier d'identification SSH pour que seul le propriétaire puisse y accéder.
+  - apk update && apk add openssh-client : Met à jour les paquets et installe le client SSH.
+  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY" : Utilise SSH pour se connecter à l'instance EC2, puis se connecte au registre Docker GitLab CI/CD pour l'authentification.
+  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}" : Télécharge l'image Docker associée à la branche actuelle depuis le registre Docker GitLab CI/CD.
+  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true" : Supprime le conteneur Docker existant s'il porte le nom "static-webapp".
+  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}" : Lance un nouveau conteneur Docker à partir de l'image téléchargée, avec le nom "static-webapp" et exposant le port 80.
+5. environment: : Déclare l'environnement associé à cet déploiement.
+6. only: : Indique les conditions pour exécuter ce job, dans ce cas, il ne sera exécuté que pour la branche principale ("main").
+
+### setup (variable)
+Les variables configurées : 
+Définition de l'utilisateur et l'adresse ip à utiliser pour la connexion en ssh
+````
+variables:
+  SERVER_USER: ubuntu
+  SERVER_IP: 54.90.253.3 #Public IP address EC2 on AWS
+````
+ID_RSA : conrespond au contenu de fichier de clé privé généré lors de la création de l'intance ec2 sur laquelle sera déployé l'application en phase de staging, bien faire attention de définir le type de variable comme fichier `"file"` 
+>![Alt text](image-31.png)
+
+
+
+### Rendu du déployement
+Une fois le merge requeste validé pour l'ajout de nouvelles fonctionnalité à la branche principale `main`, le deploiement de l'application static-webapp est lancé en environnement de staging
+![Alt text](image-33.png)
+![Alt text](image-34.png)
+
+#### Rendu Application static-webapp
+`http://http://54.90.253.3:80`
+![Alt text](image-32.png)
 
