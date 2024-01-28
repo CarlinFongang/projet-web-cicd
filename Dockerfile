@@ -1,4 +1,5 @@
-FROM ubuntu:18.04
+ARG version="18.04"
+FROM ubuntu:$version
 LABEL maintainer="Carlinfg <fongangcarlin@gmail.com>"
 
 # Définit le répertoire de travail

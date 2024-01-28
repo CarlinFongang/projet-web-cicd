@@ -215,8 +215,9 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 >![Alt text](image-18.png)
 *setting variables*
 
-#### How to setup link heroku
+#### How to setup Heroku API and link to deploy envoronment
 [visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
+
 
 ### Setup a new branch in a same project
 1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
@@ -230,16 +231,44 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 
 ### Rendu
+>![Alt text](image-22.png)
 >![Alt text](image-21.png)
 
+#### Rendu Application static-webapp
+>![Alt text](image-26.png)
+>![Alt text](image-24.png)
+*Dashbord Heroku avec historique de déployements*
 
-
+*Insérer la capture correspondante de l'application web*
 
 ## stop review stage
 ### Description 
+Ce stage est destiné à interrompre les environnements de révision associés aux demandes de fusion (merge). Déclenché uniquement lorsqu'une demande de fusion est prête à être fusionnée manuellement, il utilise la variable `GIT_STRATEGY` définie sur `"none"` pour ignorer les opérations Git. Le script installe `npm` et l'outil `Heroku CLI`, se connecte au registre de conteneurs Heroku, puis détruit l'application Heroku correspondant à la branche fusionnée, nettoyant ainsi les ressources de manière efficace après la fusion.
 
-### Explication
+>![Alt text](image-23.png)
+*Script de suppression de l'environnement de review après validation du merge request*
 
-### setup (variable)
+### Explication du script
+1. `stop-review`: Cette ligne déclare le nom de la phase du pipeline, dans ce cas "stop-review".
+
+2. `stage`: Stop review: Indique que cette phase appartient à l'étape "Stop review".
+
+3. `variables: GIT_STRATEGY: none`: Définit une variable Git, GIT_STRATEGY, avec pour valeur "none", indiquant que Git ne sera pas utilisé dans cette phase.
+
+4. `only: - merge_requests`: Spécifie que cette phase ne sera exécutée que pour les demandes de fusion.
+
+5. `when: manual`: Indique que l'exécution de cette phase doit être déclenchée manuellement.
+
+6. `environment: name: review/$CI_COMMIT_REF_NAME action: stop`: Configure l'arrêt de l'environnement nommé "review/$CI_COMMIT_REF_NAME". 
 
 ### Rendu
+>![Alt text](image-25.png)
+*Validation manuelle de la merge request*
+
+![Alt text](image-27.png)
+*Job successfull*
+
+![Alt text](image-28.png)
+*Suppression de l'environnement staticapp-new-feats*
+
+
