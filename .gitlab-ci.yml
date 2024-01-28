@@ -88,7 +88,7 @@ deploy-review: #review effectué sur un Dyno service de Heroku
     - heroku container:release -a $APP_NAME web
 
 
-.stop-review:
+stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
