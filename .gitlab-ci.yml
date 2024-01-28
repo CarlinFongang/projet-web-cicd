@@ -124,4 +124,4 @@ test staging:
   <<: *test
   stage: Test staging
   variables:
-    DOMAIN: http://$SERVER_IP
+    DOMAIN: $SERVER_IP
