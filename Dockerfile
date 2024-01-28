@@ -1,9 +1,8 @@
-ARG version="latest"
 FROM ubuntu:18.04
 LABEL maintainer="Carlinfg <fongangcarlin@gmail.com>"
 
 # Définit le répertoire de travail
-WORKDIR /var/www/html/
+#WORKDIR /var/www/html/
 
 # Installe Nginx et Git
 RUN apt-get update && \

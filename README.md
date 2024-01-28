@@ -160,7 +160,7 @@ Une requête HTTP est effectuée sur le conteneur pour vérifier la présence de
 
 
 ## Release
-Dans le stage "Release image", l'objectif est de préparer l'image Docker pour la mise en production. Le script commence par charger l'image préalablement construite dans l'environnement. Ensuite, deux tags sont ajoutés à cette image, correspondant au nom de la branche (CI_COMMIT_REF_NAME) et à l'identifiant court du commit (CI_COMMIT_SHORT_SHA). Ces tags permettent d'identifier de manière unique la version de l'image. Enfin, l'authentification est configurée pour le registre Docker de GitLab, et les tags sont poussés vers ce registre, rendant ainsi l'image disponible pour le déploiement ultérieur.
+Dans le stage "Release image", l'objectif est de préparer l'image Docker pour la mise en production. Le script commence par charger l'image préalablement construite dans l'environnement. Ensuite, deux tags sont ajoutés à cette image, correspondant au nom de la branche (`CI_COMMIT_REF_NAME`) et à l'identifiant court du commit (`CI_COMMIT_SHORT_SHA`). Ces tags permettent d'identifier de manière unique la version de l'image. Enfin, l'authentification est configurée pour le registre Docker de GitLab, et les tags sont poussés vers ce registre, rendant ainsi l'image disponible pour le déploiement ultérieur.
 >![Alt text](image-11.png)
 
 ### Explications
@@ -188,7 +188,7 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 
 ## deploy review stage
 ### Description 
-Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge_requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de npm, la configuration de l'accès au registre Heroku, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion ou de l'abandon de la demande de fusion.
+Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, dans notre cas il sagit de la branche `new-feats`, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de `npm`, la configuration de l'accès au `registre Heroku`, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion effective à la branche principale `main` .
 >![Alt text](image-17.png)
 *script du stage "deploy review"*
 
@@ -202,7 +202,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 4. `APP_NAME=staticapp-$CI_COMMIT_REF_NAME`: Définit le nom de l'application Heroku en fonction de la branche actuelle.
 
-5. `[[ ${#APP_NAME} -gt 31 ]]` && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
+5. `[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1`: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
 
 6. `heroku create $APP_NAME || echo "project already exist"`: Crée l'application Heroku avec le nom défini précédemment, en évitant une erreur si le projet existe déjà.
 
@@ -222,15 +222,15 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
 2. Se placer sur cette nouvelle branche, et raliser un commit
 3. Effectuer ensuite un merge request pour déclencher l'exécution du stage "Deploy review"
-![Alt text](image-19.png)
+>![Alt text](image-19.png)
 *exécution du merge_request*
 
-![Alt text](image-20.png)
+>![Alt text](image-20.png)
 *lancement du "Deploy review"*
 
 
 ### Rendu
-
+>![Alt text](image-21.png)
 
 
 
