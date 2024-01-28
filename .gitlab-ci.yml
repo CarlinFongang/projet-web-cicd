@@ -128,7 +128,7 @@ test staging:
   variables:
     DOMAIN: $SERVER_IP
 
-deploy production: #déployment effectué sur une instance ec2 de aws
+deploy production: #déployment effectué sur une instance ec2 de aws.
   image: alpine:latest
   stage: Deploy production
   script:
@@ -140,7 +140,7 @@ deploy production: #déployment effectué sur une instance ec2 de aws
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 344:80 --name webapp-prod ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
   environment:
     name: production
-    url: http://$SERVER_IP:344
+    url: http://$SERVER_IP
   only:
     - main
 
