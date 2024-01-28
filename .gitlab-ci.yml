@@ -58,7 +58,7 @@ deploy-review:
     - merge_requests
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    #url: ${REVIEW_LINK}
+    url: ${REVIEW_LINK}
     on_stop: stop-review
   script:
     - apk --no-cache add npm
