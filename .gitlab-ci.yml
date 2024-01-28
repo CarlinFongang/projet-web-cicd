@@ -17,7 +17,7 @@ stages:
 
 variables:
   SERVER_USER: ubuntu
-  SERVER_IP: 54.90.253.3 #Public IP address EC2 on AWS
+  SERVER_IP: 3.95.66.105 #Public IP address EC2 on AWS
 
 .test_template: &test
   image: alpine
