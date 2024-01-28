@@ -94,7 +94,7 @@ stop-review:
 
 deploy staging: #déployment effectué sur une instance ec2 de aws
   image: alpine:latest
-  stage: Depoy staging
+  stage: Deploy staging
   script:
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
