@@ -104,7 +104,6 @@ release-image:
     - heroku container:login
     - heroku apps:destroy -a staticapp-$CI_COMMIT_REF_NAME --confirm staticapp-$CI_COMMIT_REF_NAME
 
-
 deploy staging: #déployment effectué sur une instance ec2 de aws
   image: alpine:latest
   stage: Deploy staging
@@ -116,7 +115,7 @@ deploy staging: #déployment effectué sur une instance ec2 de aws
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
   environment:
-    name: staging 
+    name: staging
     url: http://$SERVER_IP
   only:
     - main
