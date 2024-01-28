@@ -30,7 +30,6 @@ test-acceptation:
     - docker rm -f staticapp-test >/dev/null 2>&1 && echo "Conteneur précédent supprimé." || echo "Aucun conteneur du même nom n'exite."
     - docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest
     - sleep 5
-    #- docker ps
     - apk --no-cache add curl
     - ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)
     - curl -I "http://static-webapp"
@@ -42,8 +41,6 @@ test-acceptation:
 
 release-image:
   stage: Release image
-  tags:
-    - carlinfg
   script: 
     - docker load < staticapp.tar
     #ajout des variable d'environnement permettant de tagger la release
@@ -57,8 +54,6 @@ release-image:
 
 deploy-review:
   stage: Deploy review
-  tags:
-    - carlinfg
   only:
     - merge_requests
   environment:
@@ -78,8 +73,6 @@ deploy-review:
 
 stop-review:
   stage: Stop review
-  tags:
-    - carlinfg
   variables:
     GIT_STRATEGY: none
   only:
