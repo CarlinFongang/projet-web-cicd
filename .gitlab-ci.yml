@@ -11,6 +11,8 @@ stages:
   - Stop review 
   - Deploy staging
   - Test staging
+  - Deploy production
+  - Test production
 
 
 variables:
@@ -39,7 +41,7 @@ docker-build:
       - staticapp.tar
 
 
-.test-acceptation:
+test-acceptation:
   stage: Test acceptation
   script:
     - docker rmi -f staticapp >/dev/null 2>&1 && echo "Image précédente supprimé." || echo "Aucune image du même nom n'exite."
@@ -69,7 +71,7 @@ release-image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 
-.deploy-review: #review effectué sur un Dyno service de Heroku
+deploy-review: #review effectué sur un Dyno service de Heroku
   stage: Deploy review
   only:
     - merge_requests
@@ -88,7 +90,7 @@ release-image:
     - heroku container:release -a $APP_NAME web
 
 
-.stop-review:
+stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
@@ -125,3 +127,25 @@ test staging:
   stage: Test staging
   variables:
     DOMAIN: $SERVER_IP
+
+deploy production: #déployment effectué sur une instance ec2 de aws
+  image: alpine:latest
+  stage: Deploy production
+  script:
+    - chmod og= $ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f webapp-prod || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 344:80 --name webapp-prod ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+  environment:
+    name: production
+    url: http://$SERVER_IP:344
+  only:
+    - main
+
+test production:
+  <<: *test
+  stage: Test production
+  variables:
+    DOMAIN: $SERVER_IP:344
