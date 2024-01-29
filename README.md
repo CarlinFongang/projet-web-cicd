@@ -187,7 +187,7 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 >![Alt text](img/image-14.png)
 
 
-## 7. deploy review stage
+## 7. Deploy review stage
 ### 7.1. Description 
 Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, dans notre cas il sagit de la branche `new-feats`, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de `npm`, la configuration de l'accès au `registre Heroku`, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion effective à la branche principale `main` .
 >![Alt text](img/image-17.png)
@@ -211,7 +211,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 8. `heroku container:release -a $APP_NAME web`: Met en production l'application sur Heroku en publiant les conteneurs précédemment poussés.
 
-### 7.3. setup (variable)
+### 7.3. Setup (variable)
 `Settings > CICD > Variables`
 >![Alt text](img/image-18.png)
 *setting variables*
@@ -242,7 +242,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 *Insérer la capture correspondante de l'application web*
 
-## 8. stop review stage
+## 8. Stop review stage
 ### 8.1. Description 
 Ce stage est destiné à interrompre les environnements de révision associés aux demandes de fusion (merge). Déclenché uniquement lorsqu'une demande de fusion est prête à être fusionnée manuellement, il utilise la variable `GIT_STRATEGY` définie sur `"none"` pour ignorer les opérations Git. Le script installe `npm` et l'outil `Heroku CLI`, se connecte au registre de conteneurs Heroku, puis détruit l'application Heroku correspondant à la branche fusionnée, nettoyant ainsi les ressources de manière efficace après la fusion.
 
@@ -274,7 +274,7 @@ Ce stage est destiné à interrompre les environnements de révision associés a
 
 
 
-## 9. deploy staging
+## 9. Deploy staging
 ### 9.1. Description 
 Le script "deploy staging" orchestre le déploiement de l'application static-webapp, basé sur l'image staticapp sur une instance EC2 AWS, représentant l'environnement de staging. L'image Docker de base utilise est Alpine, il met à jour les paquets et installe le client SSH. En utilisant SSH, il se connecte à l'instance EC2 avec les clés d'identification fournies et effectue plusieurs actions : il se connecte au registre Docker GitLab CI/CD pour télécharger l'image Docker associée à la branche actuelle (main), supprime un éventuel conteneur existant portant le nom "static-webapp" qui aurai été déployé précédement, puis lance un nouveau conteneur Docker à partir de l'image téléchargée. L'environnement "staging" est défini pour cette instance, avec une URL donnée, et le déploiement est limité à la branche principale ("main").
 
@@ -295,7 +295,7 @@ Le script "deploy staging" orchestre le déploiement de l'application static-web
 5. environment: : Déclare l'environnement associé à cet déploiement.
 6. only: : Indique les conditions pour exécuter ce job, dans ce cas, il ne sera exécuté que pour la branche principale ("main").
 
-### 9.3. setup (variable)
+### 9.3. Setup (variable)
 Les variables configurées : 
 Définition de l'utilisateur et l'adresse ip à utiliser pour la connexion en ssh
 ````
@@ -318,7 +318,7 @@ Une fois le merge requeste validé pour l'ajout de nouvelles fonctionnalité à 
 >![Alt text](img/image-32.png)
 
 
-## 10. test staging
+## 10. Test staging
 ### 10.1. Description 
 Ce script définit un job de test appelé "test staging" qui hérite des paramètres du job "test" précédemment défini plus haut dans le fichier .gitlab-ci.yml. Il spécifie le stade "Test staging" dans le pipeline. De plus, il surcharge une variable d'environnement "DOMAIN" avec la valeur "http://$SERVER_IP", avec "$SERVER_IP" qui une variable d'environnement définie plus haut dans le pipeline. Ce job est destiné à tester les fonctionnalités de l'application sur un environnement de staging spécifique.
 
@@ -349,7 +349,7 @@ noté que certains stage ont été mis en commentaire, pour accélérer le rendu
 En environnement de production, toutes les étapes devrons être exécutées
 
 
-## 11. deploy staging
+## 11. Deploy staging
 ### 11.1. Description 
 Le déploiement en production est similaire au déploiement et test en staging ! 😊
 Reprendre le déploiement en staging en y apportant quelques modifications 
