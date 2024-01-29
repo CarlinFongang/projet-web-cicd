@@ -1,4 +1,4 @@
-# Gitlab-CI | Automate deploying a Dockerized basic web application with Gitlab CI and AWS
+# Gitlab-CI | Automate deploying a Dockerized basic web application with Gitlab CI/CD pipeline on Heroko and AWS
 
 [Please find the specifications by clicking](https://github.com/eazytraining/gitlab-ci-training/tree/2ea9e36e03909e19ceb2fae2d9d950b3dc8546e8/TPs%20Heroku/TP6%20-%20Test%20de%20validation")
 
@@ -11,28 +11,29 @@ Surname : FONGANG
 Email : fongangcarlin@gmail.com
 
 
-<img src="https://media.licdn.com/dms/image/C4E03AQEUnPkOFFTrWQ/profile-displayphoto-shrink_400_400/0/1618084678051?e=1710979200&v=beta&t=sMjRKoI0WFlbqYYgN0TWVobs9k31DBeSiOffAOM8HAo" width="50" height="50" alt="Carlin Fongang"> 
-
-LinkedIn : https://www.linkedin.com/in/carlinfongang/
+><img src="https://media.licdn.com/dms/image/C4E03AQEUnPkOFFTrWQ/profile-displayphoto-shrink_400_400/0/1618084678051?e=1710979200&v=beta&t=sMjRKoI0WFlbqYYgN0TWVobs9k31DBeSiOffAOM8HAo" width="50" height="50" alt="Carlin Fongang"> 
+>
+>LinkedIn : https://www.linkedin.com/in/carlinfongang/
 
 _______
-## Documenting my experiments with Gitlab CI to deploy a Dockerized html application.
->![Alt text](image-3.png)
+## Documenting my experiments with Gitlab CI to deploy a Dockerized html application on aws and heroku PaaS.
+>![Alt text](<bannière projet cicd.png>)
 
 ## Architecture
->![Alt text](image-2.png)
+>![Alt text](<Gitlab CICD - Deploy AWS & Heroku.png>)
 
 ## Overview
 Dans cet projet, je vais déployer un projet via une chaine CI/CD sur Gitlab, en utilisant leur suite complète d'outils pour enfin placer mon application groupée sur le serveur de production basé sur une instance EC2 de AWS.
 
 ## The Project
 Un petit commentaire sur la configuration du projet. L'intention étant de mettre en exergue le déploiement en environnement de production en usant des outils tels que  Gitlab ainsi que  la configuration de docker/nginx via l'application Web static-website-example.
-
+Le projet fera intervenir : 
 1. Application Web  basic qui affiche un page web static avec du contenu texte et des couleurs.
 2. Serveur Web fonctionnant sur nginx.
-3. Un seul conteneur Docker sans aucune couche de persistance.
-4. Le serveur de production sera sur AWS, Ubuntu 22.04.
-5. Gitlab pour héberger le contrôle de source, les pipelines CI et le référentiel de conteneurs.
+3. Un conteneur Docker pour chaque stage nécessitant un deploiement.
+5. Le serveur pour le test d'acceptance sera un server de type Dyno de chez Heroku
+4. Le serveur de staging et production sera sur AWS, sous Ubuntu 22.04 LTS  .
+5. Gitlab pour héberger le contrôle de source, les pipelines CI/CD et le référentiel de conteneurs.
 
 ## Intended Workflow
 Lorsqu'un développeur pousse vers une branche principale ou des balises,
@@ -42,10 +43,10 @@ Lorsqu'un développeur pousse vers une branche principale ou des balises,
 3. Ensuite on effectura un test d'acceptance pour s'assurer du la fiabilité de l'image Docker buildé
 4. L'image Docker est ensuite transférée vers le registre de conteneurs Gitlab comme release.
 5. L'exécuteur de pipeline va lancer le déploiement de l'image sur l'environnement de review lors de nouvelle merge request.
-6. Une fois la version en review validé, et la merge sur la branche main validé, l'étape de stop review pour la suppression de l'environnement de review sera lancée
-7. Après le stop review effectué dans le pipeline, le déploiement en environnemnet de staging sera exécuté dnas le pipeline
-8. Une test du staging sera ensuite exécuté pour vérifié la disponibilité de l'application en staging
-9. Une fois l'étape 8. validé dans le pipeline (test staging), le deploiement en production sera exécuté
+6. Une fois la version en `review` validée, et la merge sur la branche `main` effectuée, l'étape de `stop review` pour la suppression de l'environnement de review sera lancée
+7. Après le `stop review` effectué dans le pipeline, le déploiement en environnemnet de staging sera exécuté
+8. Une test du staging sera ensuite exécuté pour vérifié la disponibilité de l'application en environnement de staging
+9. Une fois l'étape 8 validée dans le pipeline (test staging), le deploiement en production sera exécuté
 10. Enfin, un test du déploiment constituant la dernière étape du pipeline sera effectué pour validé la disponibilité de l'application en production
 
 ## 1. Dockerfile content
@@ -309,12 +310,12 @@ ID_RSA : conrespond au contenu de fichier de clé privé généré lors de la cr
 
 ### 9.4. Rendu du déployement
 Une fois le merge requeste validé pour l'ajout de nouvelles fonctionnalité à la branche principale `main`, le deploiement de l'application static-webapp est lancé en environnement de staging
-![Alt text](image-33.png)
-![Alt text](image-34.png)
+>![Alt text](image-33.png)
+>![Alt text](image-34.png)
 
 #### Rendu Application static-webapp
 `http://54.90.253.3:80`
-![Alt text](image-32.png)
+>![Alt text](image-32.png)
 
 
 ## 10. test staging
@@ -348,22 +349,27 @@ noté que certains stage ont été mis en commentaire, pour accélérer le rendu
 En environnement de production, toutes les étapes devrons être exécutées
 
 
-
-
 ## 11. deploy staging
 ### 11.1. Description 
-
-
-### 11.2. Explications du script
-
-
-### 11.3. setup (variable)
-
-
+Le déploiement en production est similaire au déploiement et test en staging ! 😊
+Reprendre le déploiement en staging en y apportant quelques modifications 
 
 ### 11.4. Rendu du déployement
+>![Alt text](image-41.png)
+*Validation du déploiement et du test en production*
+>![Alt text](image-40.png)
+*Reponse du test en production*
 
+#### Rendu Application webapp-prod
+>![Alt text](image-39.png)
+*Application disponible en production*
 
-#### Rendu Application static-webapp
+## 12. Ressource complémentaire 
+### 12.1. Configuré un compte heroku
+[visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
 
+### 12.2. Mettre en place un runner privé avec gitlab-runner pour Docker
+[visit this link to setup a private Docker gitlab-runner](https://gitlab.com/CarlinFongang/lab4-deployment)
 
+# Conclusion du projet.🙌
+To be continious....
