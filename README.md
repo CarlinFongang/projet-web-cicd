@@ -17,10 +17,10 @@ Email : fongangcarlin@gmail.com
 
 _______
 ## Documenting my experiments with Gitlab CI to deploy a Dockerized html application on aws and heroku PaaS.
->![Alt text](<bannière projet cicd.png>)
+>![Alt text](img/bannière%20projet%20cicd.png)
 
 ## Architecture
->![Alt text](<Gitlab CICD - Deploy AWS & Heroku.png>)
+>![Alt text](img/Gitlab%20CICD%20-%20Deploy%20AWS%20&%20Heroku.png)
 
 ## Overview
 Dans cet projet, je vais déployer un projet via une chaine CI/CD sur Gitlab, en utilisant leur suite complète d'outils pour enfin placer mon application groupée sur le serveur de production basé sur une instance EC2 de AWS.
@@ -51,7 +51,7 @@ Lorsqu'un développeur pousse vers une branche principale ou des balises,
 
 ## 1. Dockerfile content
 Déclaration du Dockerfile qui va servir au futur build du projet dans la première étape du pipeline 
->![Alt text](image-5.png)
+>![Alt text](img/image-5.png)
 
 Ce Dockerfile définit les étapes nécessaires pour créer une image Docker basée sur Ubuntu 18.04, avec Nginx installé et un dépôt Git cloné pour servir un site web statique. Voici une explication point par point :
 
@@ -65,7 +65,7 @@ Ce Dockerfile définit les étapes nécessaires pour créer une image Docker bas
 
 
 ## 3. Mise en place du projet Gitlab
->![Alt Page du projet Gitlab](image-6.png)
+>![Alt Page du projet Gitlab](img/image-6.png)
 ### 3.1. Créez un nouveau projet
 Créez un nouveau projet et notez les instructions sur la façon de transmettre votre code au projet. Avant cela, assurez-vous d'avoir déjà configuré vos clés SSH pour la connextion à Gitlab depuis votre pc.
 
@@ -86,7 +86,7 @@ Créez un fichier caché .gitlab-ci.yml et placez-le dans la repertoire racine d
 cd projet-web-cicd\
 cat .gitlab-ci.yml
 ````
->![Alt text](image-7.png)
+>![Alt text](img/image-7.png)
 
 Il y a un total de 9 étapes dans notre processus de fabrication de pipeline. Défini en haut du fichier .gitlab-ci.yml
 1. Build: Construction de l'image docker qui sera utilisé pour les futur déploiements.
@@ -104,7 +104,7 @@ Il y a un total de 9 étapes dans notre processus de fabrication de pipeline. D�
 dans cette étape, je fait appel directement au code depuis le repo distance 
 dans le stage  docker-build, nous utilisons une image Docker pour créer une autre image Docker, vous pouvez donc voir que nous avons utilisé l'image docker:latest et comme service docker:dind.
 Une fois l'image buildé, nous allons gardé le produit de cette phase sous forme d'artifact pour un usage ultérieur 
->![Alt text](image-8.png)
+>![Alt text](img/image-8.png)
 *stage build dans le gitlab-ci*
 
 ### 4.1. Explications
@@ -116,14 +116,14 @@ Une fois l'image buildé, nous allons gardé le produit de cette phase sous form
 
 
 ### 4.2. Résultats
->![Alt text](image.png)
+>![Alt text](img/image.png)
 *build dans le pipeline CI/CD*
 
->![Alt text](image-16.png)
+>![Alt text](img/image-16.png)
 
 
 >Build > Artifacts
->![Alt text](image-15.png)
+>![Alt text](img/image-15.png)
 *Artifact staticapp.tar*
 
 
@@ -132,7 +132,7 @@ Une fois l'image buildé, nous allons gardé le produit de cette phase sous form
 Dans le stage "test-acceptation", l'image Docker "staticapp" produit à la phase de build est chargée, et un conteneur temporaire nommé "staticapp-test" est créé à partir de cette image. Le conteneur tourne en arrière-plan sur le port 80. Un délai de 5 secondes est introduit pour permettre au conteneur de s'initialiser. Ensuite, l'utilitaire Curl est installé pour effectuer des requêtes HTTP. L'adresse IP du conteneur est obtenue à l'aide de la commande Docker inspect. 
 
 Une requête HTTP est effectuée sur le conteneur pour vérifier la présence de la chaîne "DIMENSION". Enfin, l'adresse IP du conteneur est affichée en sortie. Ce stage vise à tester et à valider le fonctionnement de l'application statique dans un environnement isolé.
->![Alt text](image-9.png)
+>![Alt text](img/image-9.png)
 
 ### 5.1. Explication
 
@@ -152,17 +152,17 @@ Une requête HTTP est effectuée sur le conteneur pour vérifier la présence de
 
 
 ### 5.2. Résultats
->![Alt text](image-1.png)
+>![Alt text](img/image-1.png)
 *job test_acceptation*
 
->![Alt text](image-10.png)
+>![Alt text](img/image-10.png)
 *Retour vérifiée de la requette curl*
 
 
 
 ## 6. Release
 Dans le stage "Release image", l'objectif est de préparer l'image Docker pour la mise en production. Le script commence par charger l'image préalablement construite dans l'environnement. Ensuite, deux tags sont ajoutés à cette image, correspondant au nom de la branche (`CI_COMMIT_REF_NAME`) et à l'identifiant court du commit (`CI_COMMIT_SHORT_SHA`). Ces tags permettent d'identifier de manière unique la version de l'image. Enfin, l'authentification est configurée pour le registre Docker de GitLab, et les tags sont poussés vers ce registre, rendant ainsi l'image disponible pour le déploiement ultérieur.
->![Alt text](image-11.png)
+>![Alt text](img/image-11.png)
 
 ### 6.1. Explications
 1. `docker load < staticapp.tar`: Cette commande charge l'image Docker préalablement construite, qui est stockée dans le fichier staticapp.tar.
@@ -178,19 +178,19 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 6. `docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"`: De même, l'image avec le tag basé sur l'identifiant court du commit est également poussée vers le registre, rendant ainsi les deux versions accessibles pour le déploiement ultérieur.
 
 ### 6.2. Rendu
->![Alt text](image-12.png)
->![Alt text](image-13.png)
+>![Alt text](img/image-12.png)
+>![Alt text](img/image-13.png)
 *Bon déroulement du job release*
 
 #### Sauvegarde de la release
 >Deploy > Container Registry > projet-web-cicd
->![Alt text](image-14.png)
+>![Alt text](img/image-14.png)
 
 
 ## 7. deploy review stage
 ### 7.1. Description 
 Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, dans notre cas il sagit de la branche `new-feats`, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de `npm`, la configuration de l'accès au `registre Heroku`, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion effective à la branche principale `main` .
->![Alt text](image-17.png)
+>![Alt text](img/image-17.png)
 *script du stage "deploy review"*
 
 
@@ -213,7 +213,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 ### 7.3. setup (variable)
 `Settings > CICD > Variables`
->![Alt text](image-18.png)
+>![Alt text](img/image-18.png)
 *setting variables*
 
 #### How to setup Heroku API and link to deploy envoronment
@@ -224,20 +224,20 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
 2. Se placer sur cette nouvelle branche, et raliser un commit
 3. Effectuer ensuite un merge request pour déclencher l'exécution du stage "Deploy review"
->![Alt text](image-19.png)
+>![Alt text](img/image-19.png)
 *exécution du merge_request*
 
->![Alt text](image-20.png)
+>![Alt text](img/image-20.png)
 *lancement du "Deploy review"*
 
 
 ### 7.5. Rendu
->![Alt text](image-22.png)
->![Alt text](image-21.png)
+>![Alt text](img/image-22.png)
+>![Alt text](img/image-21.png)
 
 #### Rendu Application static-webapp
->![Alt text](image-26.png)
->![Alt text](image-24.png)
+>![Alt text](img/image-26.png)
+>![Alt text](img/image-24.png)
 *Dashbord Heroku avec historique de déployements*
 
 *Insérer la capture correspondante de l'application web*
@@ -246,7 +246,7 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 ### 8.1. Description 
 Ce stage est destiné à interrompre les environnements de révision associés aux demandes de fusion (merge). Déclenché uniquement lorsqu'une demande de fusion est prête à être fusionnée manuellement, il utilise la variable `GIT_STRATEGY` définie sur `"none"` pour ignorer les opérations Git. Le script installe `npm` et l'outil `Heroku CLI`, se connecte au registre de conteneurs Heroku, puis détruit l'application Heroku correspondant à la branche fusionnée, nettoyant ainsi les ressources de manière efficace après la fusion.
 
->![Alt text](image-23.png)
+>![Alt text](img/image-23.png)
 *Script de suppression de l'environnement de review après validation du merge request*
 
 ### 8.2. Explication du script
@@ -263,13 +263,13 @@ Ce stage est destiné à interrompre les environnements de révision associés a
 6. `environment: name: review/$CI_COMMIT_REF_NAME action: stop`: Configure l'arrêt de l'environnement nommé "review/$CI_COMMIT_REF_NAME". 
 
 ### 8.3. Rendu
->![Alt text](image-25.png)
+>![Alt text](img/image-25.png)
 *Validation manuelle de la merge request*
 
->![Alt text](image-27.png)
+>![Alt text](img/image-27.png)
 *Job successfull*
 
->![Alt text](image-28.png)
+>![Alt text](img/image-28.png)
 *Suppression de l'environnement staticapp-new-feats*
 
 
@@ -278,8 +278,8 @@ Ce stage est destiné à interrompre les environnements de révision associés a
 ### 9.1. Description 
 Le script "deploy staging" orchestre le déploiement de l'application static-webapp, basé sur l'image staticapp sur une instance EC2 AWS, représentant l'environnement de staging. L'image Docker de base utilise est Alpine, il met à jour les paquets et installe le client SSH. En utilisant SSH, il se connecte à l'instance EC2 avec les clés d'identification fournies et effectue plusieurs actions : il se connecte au registre Docker GitLab CI/CD pour télécharger l'image Docker associée à la branche actuelle (main), supprime un éventuel conteneur existant portant le nom "static-webapp" qui aurai été déployé précédement, puis lance un nouveau conteneur Docker à partir de l'image téléchargée. L'environnement "staging" est défini pour cette instance, avec une URL donnée, et le déploiement est limité à la branche principale ("main").
 
->![Alt text](image-29.png)
->![Alt text](image-30.png)
+>![Alt text](img/image-29.png)
+>![Alt text](img/image-30.png)
 
 ### 9.2. Explications du script
 1. `deploy staging`: : Définit le nom du job de déploiement comme "deploy staging".
@@ -304,27 +304,27 @@ variables:
   SERVER_IP: 54.90.253.3 #Public IP address EC2 on AWS
 ````
 ID_RSA : conrespond au contenu de fichier de clé privé généré lors de la création de l'intance ec2 sur laquelle sera déployé l'application en phase de staging, bien faire attention de définir le type de variable comme fichier `"file"` 
->![Alt text](image-31.png)
+>![Alt text](img/image-31.png)
 
 
 
 ### 9.4. Rendu du déployement
 Une fois le merge requeste validé pour l'ajout de nouvelles fonctionnalité à la branche principale `main`, le deploiement de l'application static-webapp est lancé en environnement de staging
->![Alt text](image-33.png)
->![Alt text](image-34.png)
+>![Alt text](img/image-33.png)
+>![Alt text](img/image-34.png)
 
 #### Rendu Application static-webapp
 `http://54.90.253.3:80`
->![Alt text](image-32.png)
+>![Alt text](img/image-32.png)
 
 
 ## 10. test staging
 ### 10.1. Description 
 Ce script définit un job de test appelé "test staging" qui hérite des paramètres du job "test" précédemment défini plus haut dans le fichier .gitlab-ci.yml. Il spécifie le stade "Test staging" dans le pipeline. De plus, il surcharge une variable d'environnement "DOMAIN" avec la valeur "http://$SERVER_IP", avec "$SERVER_IP" qui une variable d'environnement définie plus haut dans le pipeline. Ce job est destiné à tester les fonctionnalités de l'application sur un environnement de staging spécifique.
 
->![Alt text](image-35.png)
+>![Alt text](img/image-35.png)
 *definition du tamplete de test*
->![Alt text](image-36.png)
+>![Alt text](img/image-36.png)
 *définition du job de test en environnement de staging*
 
 ### 10.2. Explications du script
@@ -341,8 +341,8 @@ Ce script définit un job de test appelé "test staging" qui hérite des paramè
 
 ### 10.4. Rendu
 Réponse du `curl http://$DOMAIN | grep -i "dimension"`
->![Alt text](image-38.png)
->![Alt text](image-37.png)
+>![Alt text](img/image-38.png)
+>![Alt text](img/image-37.png)
 *test réussi*
 
 noté que certains stage ont été mis en commentaire, pour accélérer le rendu du pipeline.
@@ -355,13 +355,13 @@ Le déploiement en production est similaire au déploiement et test en staging !
 Reprendre le déploiement en staging en y apportant quelques modifications 
 
 ### 11.4. Rendu du déployement
->![Alt text](image-41.png)
+>![Alt text](img/image-41.png)
 *Validation du déploiement et du test en production*
->![Alt text](image-40.png)
+>![Alt text](img/image-40.png)
 *Reponse du test en production*
 
 #### Rendu Application webapp-prod
->![Alt text](image-39.png)
+>![Alt text](img/image-39.png)
 *Application disponible en production*
 
 ## 12. Ressource complémentaire 
