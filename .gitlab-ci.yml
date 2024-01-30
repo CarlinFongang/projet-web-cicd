@@ -17,7 +17,7 @@ stages:
 
 variables:
   SERVER_USER: ubuntu
-  SERVER_IP: 34.234.93.228 #Public IP address EC2 on AWS
+  SERVER_IP: 3.95.66.105 #Public IP address EC2 on AWS
 
 .test_template: &test
   image: alpine
@@ -64,8 +64,8 @@ release-image:
 
 deploy-review: #Review performed on a Heroku Dyno service
   stage: Deploy review
-  only:
-    - merge_requests
+  #only:
+  #  - merge_requests
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: ${REVIEW_LINK}
@@ -80,7 +80,7 @@ deploy-review: #Review performed on a Heroku Dyno service
     - heroku container:push -a $APP_NAME web
     - heroku container:release -a $APP_NAME web
 
-stop-review:
+.stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
@@ -129,12 +129,12 @@ deploy-production: #Deployment carried out on an AWS EC2 instance
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f webapp-prod || true"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name webapp-prod ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
   environment:
-    name: staging
+    name: production
     url: http://$SERVER_IP
   only:
     - main
 
-test-production:
+test production:
   <<: *test
   stage: Test production
   variables:
