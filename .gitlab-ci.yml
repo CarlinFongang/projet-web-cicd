@@ -30,7 +30,7 @@ variables:
 docker-build:
   stage: Build
   script:
-    - docker build --pull -t staticapp .
+    - docker build --tag staticapp .
     - docker save staticapp > staticapp.tar
   artifacts:
     paths:
@@ -64,12 +64,12 @@ release-image:
 
 deploy-review: #Review performed on a Heroku Dyno service
   stage: Deploy review
-  #only:
-  #  - merge_requests
+  only:
+    - merge_requests
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: ${REVIEW_LINK}
-    #on_stop: stop-review
+    on_stop: stop-review
   script:
     - apk --no-cache add npm
     - npm install -g heroku
@@ -80,7 +80,7 @@ deploy-review: #Review performed on a Heroku Dyno service
     - heroku container:push -a $APP_NAME web
     - heroku container:release -a $APP_NAME web
 
-.stop-review:
+stop-review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
@@ -108,7 +108,7 @@ deploy-staging: #Deployment carried out on an AWS EC2 instance
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 344:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
   environment:
     name: staging
-    url: http://$SERVER_IP
+    url: http://$SERVER_IP:344
   only:
     - main
 

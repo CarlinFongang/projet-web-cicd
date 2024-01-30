@@ -85,7 +85,7 @@ git push --set-upstream origin main
 Create a hidden file named .gitlab-ci.yml and place it in the root directory of the project. This is necessary for GitLab to retrieve and configure the pipeline. Once GitLab detects this file, it will assign runners to execute your pipeline. The content of the gitlab-ci.yml is as follows.
 
 ````
-cd projet-web-cicd\
+cd projet-web-cicd/
 cat .gitlab-ci.yml
 ````
 >![Alt text](img/image-7.png)
@@ -109,7 +109,7 @@ In this step, I directly access the code from the remote repository. In the dock
 *stage build dans le gitlab-ci*
 
 ### 4.1. Explanations
-1. `docker build --pull -t staticapp .`: This command builds a Docker image from the Dockerfile present in the current directory (.). The --pull option ensures that the base images are always up to date.
+1. `docker build --tag staticapp .`: This command builds a Docker image from the Dockerfile present in the current directory (.). The --pull option ensures that the base images are always up to date.
 
 2. `docker save staticapp > staticapp.tar`: The built Docker image is then saved as a tar archive in the file staticapp.tar. This archive contains the complete image, ready to be loaded later.
 
@@ -288,12 +288,45 @@ The "deploy staging" script orchestrates the deployment of the static-webapp app
 2. image: alpine:latest: Specifies the Docker image to use for running the job, in this case, Alpine Linux.
 3. stage: Deploy staging: Indicates the deployment stage in the GitLab pipeline, here "Deploy staging".
 4. script:
-   - chmod og= $ID_RSA: Adjusts the permissions of the SSH identification file so that only the owner can access it.
-   - apk update && apk add openssh-client: Updates packages and installs the SSH client.
-   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY": Uses SSH to connect to the EC2 instance, then connects to the GitLab CI/CD Docker registry for authentication.
-   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}": Downloads the Docker image associated with the current branch from the GitLab CI/CD Docker registry.
-   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true": Removes the existing Docker container if it's named "static-webapp".
-   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}": Launches a new Docker container from the downloaded image, with the name "static-webapp" and exposing port 80.
+    Here are the explanations for each line of the script:
+
+ - 
+ ````
+ chmod og= $ID_RSA
+ ````
+  This command changes the permissions of the file represented by the variable $ID_RSA by removing access permissions for groups and other users. This can be used to secure SSH private keys.
+
+ - 
+ ````
+ apk update && apk add openssh-client
+ ````
+  These commands update the apk package repositories and install the OpenSSH client in the Alpine Linux image. The OpenSSH client is required for connecting to SSH servers.
+
+ - 
+ ````
+ ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY"
+ ````
+ This line uses SSH to connect to a remote server specified by $SERVER_IP with the user $SERVER_USER, using the private key defined by $ID_RSA. Then, it executes a Docker command to authenticate to a Docker registry ($CI_REGISTRY) using the credentials specified by the environment variables $CI_REGISTRY_USER and $CI_REGISTRY_PASSWORD.
+
+ - 
+ ````
+ ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+ ````
+  This line uses SSH to connect to the remote server and executes a Docker command to pull a Docker image specified by ${IMAGE_NAME}:${CI_COMMIT_REF_NAME} from a Docker registry. This retrieves the latest version of the image for deployment.
+
+ - 
+ ````
+ ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true"
+ ````
+ This line uses SSH to connect to the remote server and removes the Docker container named "static-webapp" if it exists. The "|| true" ensures that the command will not fail if the container does not exist.
+
+ - 
+ ````
+ ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 344:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+ ```` 
+ This line uses SSH to connect to the remote server and executes a Docker command to start a new Docker container named "static-webapp" from the image specified by ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}. The container is started in detached mode (-d) and exposes port 80 of the container on port 344 of the host machine.
+    
+
 5. environment: Declares the environment associated with this deployment.
 6. only: Indicates the conditions to run this job, in this case, it will only be executed for the main branch.
 
