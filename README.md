@@ -1,6 +1,6 @@
 # Gitlab-CI | Automate deploying a Dockerized basic web application with Gitlab CI/CD pipeline on Heroko and AWS
 
-[Please find the specifications by clicking](https://github.com/eazytraining/gitlab-ci-training/tree/2ea9e36e03909e19ceb2fae2d9d950b3dc8546e8/TPs%20Heroku/TP6%20-%20Test%20de%20validation")
+[Please find the specifications by clicking](https://github.com/eazytraining/gitlab-ci-training/")
 
 ------------
 
@@ -23,53 +23,54 @@ _______
 >![Alt text](img/Gitlab%20CICD%20-%20Deploy%20AWS%20&%20Heroku.png)
 
 ## Overview
-Dans cet projet, je vais déployer un projet via une chaine CI/CD sur Gitlab, en utilisant leur suite complète d'outils pour enfin placer mon application groupée sur le serveur de production basé sur une instance EC2 de AWS.
+In this project, I will deploy an application through a CI/CD pipeline on Gitlab, utilizing their full suite of tools to ultimately place my bundled application on the production server based on an AWS EC2 instance.
 
 ## The Project
-Un petit commentaire sur la configuration du projet. L'intention étant de mettre en exergue le déploiement en environnement de production en usant des outils tels que  Gitlab ainsi que  la configuration de docker/nginx via l'application Web static-website-example.
-Le projet fera intervenir : 
-1. Application Web  basic qui affiche un page web static avec du contenu texte et des couleurs.
-2. Serveur Web fonctionnant sur nginx.
-3. Un conteneur Docker pour chaque stage nécessitant un deploiement.
-5. Le serveur pour le test d'acceptance sera un server de type Dyno de chez Heroku
-4. Le serveur de staging et production sera sur AWS, sous Ubuntu 22.04 LTS  .
-5. Gitlab pour héberger le contrôle de source, les pipelines CI/CD et le référentiel de conteneurs.
+A brief comment on the project configuration. The intention is to highlight the deployment to a production environment using tools such as Gitlab, as well as the configuration of Docker/nginx via the static-website-example web application.
+
+The project will involve:
+1. A basic web application displaying a static web page with text content and colors.
+2. A web server running on Nginx.
+3. A Docker container for each deployment stage required.
+4. The acceptance test server will be a Dyno server from Heroku.
+5. The staging and production servers will be on AWS, running Ubuntu 22.04 LTS.
+6. Gitlab will host the source control, CI/CD pipelines, and container repository.
 
 ## Intended Workflow
-Lorsqu'un développeur pousse vers une branche principale ou des balises,
+When a developer pushes to a main branch or tags:
 
-1. Le build de l'image du docker sera déclenchée.
-2. Une nouvelle image Docker est créée et balisée.
-3. Ensuite on effectura un test d'acceptance pour s'assurer du la fiabilité de l'image Docker buildé
-4. L'image Docker est ensuite transférée vers le registre de conteneurs Gitlab comme release.
-5. L'exécuteur de pipeline va lancer le déploiement de l'image sur l'environnement de review lors de nouvelle merge request.
-6. Une fois la version en `review` validée, et la merge sur la branche `main` effectuée, l'étape de `stop review` pour la suppression de l'environnement de review sera lancée
-7. Après le `stop review` effectué dans le pipeline, le déploiement en environnemnet de staging sera exécuté
-8. Une test du staging sera ensuite exécuté pour vérifié la disponibilité de l'application en environnement de staging
-9. Une fois l'étape 8 validée dans le pipeline (test staging), le deploiement en production sera exécuté
-10. Enfin, un test du déploiment constituant la dernière étape du pipeline sera effectué pour validé la disponibilité de l'application en production
+1. The Docker image build will be triggered.
+2. A new Docker image is created and tagged.
+3. Subsequently, an acceptance test will be performed to ensure the reliability of the built Docker image.
+4. The Docker image is then transferred to the Gitlab container registry as a release.
+5. The pipeline executor will initiate the deployment of the image to the review environment during a new merge request.
+6. Once the version in `review` is validated, and the merge to the `main` branch is completed, the `stop review` step for removing the review environment will be initiated.
+7. After the `stop review` is completed in the pipeline, deployment to the staging environment will be executed.
+8. A staging test will then be conducted to verify the availability of the application in the staging environment.
+9. Once step 8 is validated in the pipeline (staging test), deployment to production will be executed.
+10. Finally, a deployment test, constituting the last step of the pipeline, will be performed to validate the availability of the application in production.
 
 ## 1. Dockerfile content
-Déclaration du Dockerfile qui va servir au futur build du projet dans la première étape du pipeline 
+Declaration of the Dockerfile that will be used for the future build of the project in the first step of the pipeline:
 >![Alt text](img/image-5.png)
 
-Ce Dockerfile définit les étapes nécessaires pour créer une image Docker basée sur Ubuntu 18.04, avec Nginx installé et un dépôt Git cloné pour servir un site web statique. Voici une explication point par point :
+This Dockerfile defines the necessary steps to create a Docker image based on Ubuntu 18.04, with Nginx installed and a cloned Git repository to serve a static website. Here's a point-by-point explanation:
 
-1. Utilise l'image de base Ubuntu version 18.04.
-2. Ajoute une étiquette (label) "maintainer" avec l'adresse e-mail de l'auteur.
-3. Définit le répertoire de travail actuel à /var/www/html/.
-4. Met à jour les paquets, installe `Curl, Nginx et Git`, puis supprime le contenu existant dans `/var/www/html/`.
-5. Clone le dépôt Git `https://github.com/CarlinFongang/static-website-example.git` dans `/var/www/html`.
-6. Expose le port 80 pour les connexions externes.
-7. Configure l'entrée principale pour démarrer Nginx en mode démon (daemon).
+1. Uses the base image Ubuntu version 18.04.
+2. Adds a "maintainer" label with the author's email address.
+3. Sets the current working directory to /var/www/html/.
+4. Updates packages, installs `Curl`, `Nginx`, and `Git`, then removes existing content in `/var/www/html/`.
+5. Clones the Git repository `https://github.com/CarlinFongang/static-website-example.git` into `/var/www/html`.
+6. Exposes port 80 for external connections.
+7. Configures the main entry point to start Nginx in daemon mode.
 
 
-## 3. Mise en place du projet Gitlab
+## 3. Setting up the GitLab project
 >![Alt Page du projet Gitlab](img/image-6.png)
 ### 3.1. Créez un nouveau projet
-Créez un nouveau projet et notez les instructions sur la façon de transmettre votre code au projet. Avant cela, assurez-vous d'avoir déjà configuré vos clés SSH pour la connextion à Gitlab depuis votre pc.
+Create a new project and take note of the instructions on how to push your code to the project. Before doing so, make sure you have already set up your SSH keys for connecting to Gitlab from your PC.
 
-### 3.2. Poussez votre projet sur gitlab
+### 3.2. Push your project to GitLab
 
 
 ````
@@ -80,42 +81,42 @@ git commit -m "Initial Commit"
 git push --set-upstream origin main
 ````
 
-### 3.3. Créez un fichier .gitlab-ci.yml
-Créez un fichier caché .gitlab-ci.yml et placez-le dans la repertoire racine du projet. Ceci est nécessaire pour que gitlab récupère et configure le pipeline. Une fois que gitlab aura détecté ce fichier, il attribuera des runners pour exécuter votre pipeline. Le contenu du gitlab-ci.yml est le suivant.
+### 3.3. Create a .gitlab-ci.yml file
+Create a hidden file named .gitlab-ci.yml and place it in the root directory of the project. This is necessary for GitLab to retrieve and configure the pipeline. Once GitLab detects this file, it will assign runners to execute your pipeline. The content of the gitlab-ci.yml is as follows.
+
 ````
 cd projet-web-cicd\
 cat .gitlab-ci.yml
 ````
 >![Alt text](img/image-7.png)
 
-Il y a un total de 9 étapes dans notre processus de fabrication de pipeline. Défini en haut du fichier .gitlab-ci.yml
-1. Build: Construction de l'image docker qui sera utilisé pour les futur déploiements.
-2. Test acceptation: Exécution de tests pour valider la fiabilité de l'image builder.
-3. Release image: Publication de l'image dans le registre gitlab pour une utilisation ultérieure.
-4. Deploy review: Déploiement d'un environnement de review pour tester les fonctionnalités de nouvelle branche.
-5. Stop review: Suppression de l'environnement de review après validation des fonctionnalités.
-6. Deploy staging: Déploiement en environnement de staging pour des tests plus larges.
-7. Test staging: Exécution de tests pour valider le déploiement en staging.
-8. Deploy prod: Déploiement en production après validation en staging.
-9. Test prod: Exécution de tests pour valider le déploiement en production.
+There are a total of 9 stages in our pipeline manufacturing process, defined at the top of the .gitlab-ci.yml file:
+
+1. Build: Building the Docker image that will be used for future deployments.
+2. Acceptance Test: Running tests to validate the reliability of the built image.
+3. Release Image: Publishing the image to the GitLab registry for future use.
+4. Deploy Review: Deploying a review environment to test new branch functionalities.
+5. Stop Review: Removing the review environment after functionality validation.
+6. Deploy Staging: Deploying to the staging environment for broader testing.
+7. Staging Test: Running tests to validate the deployment in staging.
+8. Deploy Production: Deploying to production after validation in staging.
+9. Production Test: Running tests to validate the deployment in production.
 
 
 ## 4. Setting of build stage 
-dans cette étape, je fait appel directement au code depuis le repo distance 
-dans le stage  docker-build, nous utilisons une image Docker pour créer une autre image Docker, vous pouvez donc voir que nous avons utilisé l'image docker:latest et comme service docker:dind.
-Une fois l'image buildé, nous allons gardé le produit de cette phase sous forme d'artifact pour un usage ultérieur 
+In this step, I directly access the code from the remote repository. In the docker-build stage, we utilize a Docker image to create another Docker image, so you can see that we used the docker:latest image and the docker:dind service. Once the image is built, we will keep the output of this phase as an artifact for future use.
 >![Alt text](img/image-8.png)
 *stage build dans le gitlab-ci*
 
-### 4.1. Explications
-1. `docker build --pull -t staticapp` .: Cette commande construit une image Docker à partir du Dockerfile présent dans le répertoire courant (.). L'option --pull permet de s'assurer que les images de base sont toujours à jour.
+### 4.1. Explanations
+1. `docker build --pull -t staticapp .`: This command builds a Docker image from the Dockerfile present in the current directory (.). The --pull option ensures that the base images are always up to date.
 
-2. `docker save staticapp > staticapp.tar`: L'image Docker construite est ensuite sauvegardée sous forme d'archive tar dans le fichier staticapp.tar. Cette archive contient l'image complète, prête à être chargée ultérieurement.
+2. `docker save staticapp > staticapp.tar`: The built Docker image is then saved as a tar archive in the file staticapp.tar. This archive contains the complete image, ready to be loaded later.
 
-3. `artifacts paths`: La dernière ligne spécifie que le fichier staticapp.tar doit être conservé comme un artifact de build. Cela signifie que ce fichier sera disponible pour les étapes ultérieures du pipeline, permettant son utilisation dans d'autres jobs ou stages.
+3. `artifacts paths`: The last line specifies that the staticapp.tar file should be kept as a build artifact. This means that this file will be available for subsequent steps of the pipeline, allowing its use in other jobs or stages.
 
 
-### 4.2. Résultats
+### 4.2. Results
 >![Alt text](img/image.png)
 *build dans le pipeline CI/CD*
 
@@ -129,58 +130,58 @@ Une fois l'image buildé, nous allons gardé le produit de cette phase sous form
 
 
 ## 5. Launch "test d'acceptation"
-Dans le stage "test-acceptation", l'image Docker "staticapp" produit à la phase de build est chargée, et un conteneur temporaire nommé "staticapp-test" est créé à partir de cette image. Le conteneur tourne en arrière-plan sur le port 80. Un délai de 5 secondes est introduit pour permettre au conteneur de s'initialiser. Ensuite, l'utilitaire Curl est installé pour effectuer des requêtes HTTP. L'adresse IP du conteneur est obtenue à l'aide de la commande Docker inspect. 
+In the "test-acceptance" stage, the Docker image "staticapp" produced in the build phase is loaded, and a temporary container named "staticapp-test" is created from this image. The container runs in the background on port 80. A delay of 5 seconds is introduced to allow the container to initialize. Then, the Curl utility is installed to perform HTTP requests. The container's IP address is obtained using the Docker inspect command.
 
-Une requête HTTP est effectuée sur le conteneur pour vérifier la présence de la chaîne "DIMENSION". Enfin, l'adresse IP du conteneur est affichée en sortie. Ce stage vise à tester et à valider le fonctionnement de l'application statique dans un environnement isolé.
+An HTTP request is made to the container to check for the presence of the string "DIMENSION". Finally, the container's IP address is displayed as output. This stage aims to test and validate the functionality of the static application in an isolated environment.
 >![Alt text](img/image-9.png)
 
-### 5.1. Explication
+### 5.1. Explanations
 
-1. `docker load < staticapp.tar`: Cette commande charge l'image Docker précédemment construite à partir du fichier staticapp.tar. Cela permet de restaurer l'image pour être utilisée dans un conteneur.
+1. `docker load < staticapp.tar`: This command loads the previously built Docker image from the staticapp.tar file. This restores the image to be used within a container.
 
-2. `docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest`: Cette commande lance un conteneur détaché (-d) à partir de l'image staticapp:latest. Le conteneur est nommé staticapp-test et les ports sont mappés pour rediriger le trafic du port 80 de l'hôte vers le port 80 du conteneur.
+2. `docker run --rm -d -p 80:80 --name staticapp-test staticapp:latest`: This command launches a detached container (-d) from the staticapp:latest image. The container is named staticapp-test, and ports are mapped to redirect traffic from port 80 on the host to port 80 on the container.
 
-3. `sleep 5`: Cette commande ajoute une pause de 5 secondes, permettant au conteneur de s'initialiser complètement avant de commencer les tests.
+3. `sleep 5`: This command adds a 5-second pause, allowing the container to fully initialize before starting tests.
 
-4. `apk --no-cache add curl`: Installe l'utilitaire curl dans le conteneur pour effectuer des requêtes HTTP depuis le script de test.
+4. `apk --no-cache add curl`: Installs the curl utility in the container to perform HTTP requests from the test script.
 
-5. `ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)`: Extrait l'adresse IP du conteneur staticapp-test pour une utilisation ultérieure.
+5. `ip_address=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' staticapp-test)`: Extracts the IP address of the staticapp-test container for later use.
 
-6. `curl "http://staticapp" | grep -i "DIMENSION"`: Effectue une requête HTTP sur le conteneur en utilisant son nom (staticapp). La réponse est ensuite filtrée pour rechercher la chaîne "DIMENSION" en ignorant la casse.
+6. `curl "http://staticapp" | grep -i "DIMENSION"`: Makes an HTTP request to the container using its name (staticapp). The response is then filtered to search for the "DIMENSION" string, ignoring case.
 
-7. `echo "Adresse IP du conteneur $ip_address"`: Affiche l'adresse IP du conteneur dans la sortie du script.
+7. `echo "Adresse IP du conteneur $ip_address"`: Displays the container's IP address in the script's output.
 
 
-### 5.2. Résultats
+### 5.2. Results
 >![Alt text](img/image-1.png)
 *job test_acceptation*
 
 >![Alt text](img/image-10.png)
-*Retour vérifiée de la requette curl*
+*Response verified from the curl request.*
 
 
 
 ## 6. Release
-Dans le stage "Release image", l'objectif est de préparer l'image Docker pour la mise en production. Le script commence par charger l'image préalablement construite dans l'environnement. Ensuite, deux tags sont ajoutés à cette image, correspondant au nom de la branche (`CI_COMMIT_REF_NAME`) et à l'identifiant court du commit (`CI_COMMIT_SHORT_SHA`). Ces tags permettent d'identifier de manière unique la version de l'image. Enfin, l'authentification est configurée pour le registre Docker de GitLab, et les tags sont poussés vers ce registre, rendant ainsi l'image disponible pour le déploiement ultérieur.
+In the "Release image" stage, the objective is to prepare the Docker image for production deployment. The script starts by loading the previously built image into the environment. Then, two tags are added to this image, corresponding to the branch name (`CI_COMMIT_REF_NAME`) and the short commit ID (`CI_COMMIT_SHORT_SHA`). These tags uniquely identify the version of the image. Finally, authentication is configured for the GitLab Docker registry, and the tags are pushed to this registry, making the image available for subsequent deployment.
 >![Alt text](img/image-11.png)
 
-### 6.1. Explications
-1. `docker load < staticapp.tar`: Cette commande charge l'image Docker préalablement construite, qui est stockée dans le fichier staticapp.tar.
+### 6.1. Explanations
+1. `docker load < staticapp.tar`: This command loads the previously built Docker image, which is stored in the staticapp.tar file.
 
-2. `docker tag staticapp "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"`: Deux tags sont ajoutés à l'image. Le premier tag est basé sur le nom de la branche (CI_COMMIT_REF_NAME).
+2. `docker tag staticapp "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"`: Two tags are added to the image. The first tag is based on the branch name (CI_COMMIT_REF_NAME).
 
-3. `docker tag staticapp "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"`: Le deuxième tag est basé sur l'identifiant court du commit (CI_COMMIT_SHORT_SHA).
+3. `docker tag staticapp "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"`: The second tag is based on the short commit ID (CI_COMMIT_SHORT_SHA).
 
-4. `docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY`: Cette commande configure l'authentification pour le registre Docker de GitLab en utilisant le nom d'utilisateur et le mot de passe fournis comme variables d'environnement.
+4. `docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY`: This command configures authentication for the GitLab Docker registry using the provided username and password as environment variables.
 
-5. `docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"`: L'image, avec le tag correspondant au nom de la branche, est poussée vers le registre Docker de GitLab.
+5. `docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"`: The image, with the tag corresponding to the branch name, is pushed to the GitLab Docker registry.
 
-6. `docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"`: De même, l'image avec le tag basé sur l'identifiant court du commit est également poussée vers le registre, rendant ainsi les deux versions accessibles pour le déploiement ultérieur.
+6. `docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"`: Similarly, the image with the tag based on the short commit ID is also pushed to the registry, making both versions accessible for subsequent deployment.
 
-### 6.2. Rendu
+### 6.2. Results
 >![Alt text](img/image-12.png)
 >![Alt text](img/image-13.png)
-*Bon déroulement du job release*
+*Successful execution of the release job*
 
 #### Sauvegarde de la release
 >Deploy > Container Registry > projet-web-cicd
@@ -189,27 +190,27 @@ Dans le stage "Release image", l'objectif est de préparer l'image Docker pour l
 
 ## 7. Deploy review stage
 ### 7.1. Description 
-Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des requêtes de fusion (merge requests), une application Heroku (PaaS) est créée pour chaque branche en cours d'examen, dans notre cas il sagit de la branche `new-feats`, utilisant des conteneurs pour le déploiement. Le processus comprend l'installation de `npm`, la configuration de l'accès au `registre Heroku`, la création de l'application basée sur la branche, le déploiement des conteneurs, et enfin, la mise en production de l'application sur Heroku. Cela permet d'avoir des environnements distincts pour chaque branche en cours d'évaluation, avec une URL de l'environnement de révision disponible pour des tests spécifiques à la branche. Un arrêt propre de l'environnement de révision est effectué lors de la fusion effective à la branche principale `main` .
+In the "Deploy review" stage, the pipeline is triggered only during merge requests. A Heroku application (PaaS) is created for each branch under review, in our case, it's the `new-feats` branch, using containers for deployment. The process includes installing `npm`, configuring access to the `Heroku registry`, creating the application based on the branch, deploying the containers, and finally, putting the application into production on Heroku. This allows for distinct environments for each branch under review, with a review environment URL available for branch-specific testing. A clean shutdown of the review environment is performed upon successful merging into the main branch `main`.
 >![Alt text](img/image-17.png)
 *script du stage "deploy review"*
 
 
-### 7.2. Explications du script
-1. `apk --no-cache add npm`: Installe le gestionnaire de paquets npm nécessaire pour les dépendances du projet.
+### 7.2. Explanations 
+1. `apk --no-cache add npm`: Installs the npm package manager required for project dependencies.
 
-2. `npm install -g heroku`: Installe l'outil de ligne de commande Heroku de manière globale pour faciliter les opérations Heroku.
+2. `npm install -g heroku`: Installs the Heroku command-line tool globally to facilitate Heroku operations.
 
-3. `heroku container:login`: Authentifie l'utilisateur sur le registre de conteneurs Heroku, permettant ainsi le déploiement ultérieur.
+3. `heroku container:login`: Authenticates the user to the Heroku container registry, enabling subsequent deployment.
 
-4. `APP_NAME=staticapp-$CI_COMMIT_REF_NAME`: Définit le nom de l'application Heroku en fonction de la branche actuelle.
+4. `APP_NAME=staticapp-$CI_COMMIT_REF_NAME`: Sets the name of the Heroku application based on the current branch.
 
-5. `[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1`: Vérifie la longueur du nom de l'application Heroku et arrête le script si elle dépasse la limite autorisée (30 caractères sur Heroku).
+5. `[[ ${#APP_NAME} -gt 31 ]] && echo 'the name of the heroku application you want to create is longer than 30 characters' && exit 1`: Checks the length of the Heroku application name and stops the script if it exceeds the allowed limit (30 characters on Heroku).
 
-6. `heroku create $APP_NAME || echo "project already exist"`: Crée l'application Heroku avec le nom défini précédemment, en évitant une erreur si le projet existe déjà.
+6. `heroku create $APP_NAME || echo "project already exist"`: Creates the Heroku application with the previously defined name, avoiding an error if the project already exists.
 
-7. `heroku container:push -a $APP_NAME web`: Pousse les images de conteneurs vers l'application Heroku créée, prêtes pour le déploiement.
+7. `heroku container:push -a $APP_NAME web`: Pushes container images to the created Heroku application, ready for deployment.
 
-8. `heroku container:release -a $APP_NAME web`: Met en production l'application sur Heroku en publiant les conteneurs précédemment poussés.
+8. `heroku container:release -a $APP_NAME web`: Deploys the application to Heroku by releasing the previously pushed containers into production.
 
 ### 7.3. Setup (variable)
 `Settings > CICD > Variables`
@@ -221,155 +222,155 @@ Dans le stage "Deploy review", la pipeline est déclenché uniquement lors des r
 
 
 ### 7.4. Setup a new branch in a same project
-1. Crée un unouvelle branch en s'assurant de cloner le contenu de la branche main
-2. Se placer sur cette nouvelle branche, et raliser un commit
-3. Effectuer ensuite un merge request pour déclencher l'exécution du stage "Deploy review"
+1. Create a new branch ensuring to clone the content from the main branch.
+2. Switch to this new branch and make a commit.
+3. Then, proceed to create a merge request to trigger the execution of the "Deploy review" stage.
 >![Alt text](img/image-19.png)
 *exécution du merge_request*
 
 >![Alt text](img/image-20.png)
-*lancement du "Deploy review"*
+*Initiating "Deploy review"*
 
 
-### 7.5. Rendu
+### 7.5. Results
 >![Alt text](img/image-22.png)
 >![Alt text](img/image-21.png)
 
 #### Rendu Application static-webapp
 >![Alt text](img/image-26.png)
 >![Alt text](img/image-24.png)
-*Dashbord Heroku avec historique de déployements*
+*Heroku Dashboard with Deployment History*
 
-*Insérer la capture correspondante de l'application web*
+*Insert the corresponding screenshot of the web application*
 
 ## 8. Stop review stage
 ### 8.1. Description 
-Ce stage est destiné à interrompre les environnements de révision associés aux demandes de fusion (merge). Déclenché uniquement lorsqu'une demande de fusion est prête à être fusionnée manuellement, il utilise la variable `GIT_STRATEGY` définie sur `"none"` pour ignorer les opérations Git. Le script installe `npm` et l'outil `Heroku CLI`, se connecte au registre de conteneurs Heroku, puis détruit l'application Heroku correspondant à la branche fusionnée, nettoyant ainsi les ressources de manière efficace après la fusion.
+This stage is intended to terminate the review environments associated with merge requests. Triggered only when a merge request is ready to be manually merged, it uses the `GIT_STRATEGY` variable set to `"none"` to ignore Git operations. The script installs `npm` and the `Heroku CLI` tool, connects to the Heroku container registry, and then destroys the Heroku application corresponding to the merged branch, effectively cleaning up resources after the merge.
 
 >![Alt text](img/image-23.png)
-*Script de suppression de l'environnement de review après validation du merge request*
+*Script for deleting the review environment after merge request validation*
 
-### 8.2. Explication du script
-1. `stop-review`: Cette ligne déclare le nom de la phase du pipeline, dans ce cas "stop-review".
+### 8.2. Explanations
+1. `stop-review`: This line declares the name of the pipeline stage, in this case, "stop-review".
 
-2. `stage`: Stop review: Indique que cette phase appartient à l'étape "Stop review".
+2. `stage`: Stop review: Indicates that this stage belongs to the "Stop review" step.
 
-3. `variables: GIT_STRATEGY: none`: Définit une variable Git, GIT_STRATEGY, avec pour valeur "none", indiquant que Git ne sera pas utilisé dans cette phase.
+3. `variables: GIT_STRATEGY: none`: Defines a Git variable, GIT_STRATEGY, with a value of "none", indicating that Git will not be used in this stage.
 
-4. `only: - merge_requests`: Spécifie que cette phase ne sera exécutée que pour les demandes de fusion.
+4. `only: - merge_requests`: Specifies that this stage will only be executed for merge requests.
 
-5. `when: manual`: Indique que l'exécution de cette phase doit être déclenchée manuellement.
+5. `when: manual`: Indicates that the execution of this stage must be triggered manually.
 
-6. `environment: name: review/$CI_COMMIT_REF_NAME action: stop`: Configure l'arrêt de l'environnement nommé "review/$CI_COMMIT_REF_NAME". 
+6. `environment: name: review/$CI_COMMIT_REF_NAME action: stop`: Configures the termination of the environment named "review/$CI_COMMIT_REF_NAME".
 
-### 8.3. Rendu
+
+### 8.3. Results
 >![Alt text](img/image-25.png)
-*Validation manuelle de la merge request*
+*Manual validation of the merge request*
 
 >![Alt text](img/image-27.png)
 *Job successfull*
 
 >![Alt text](img/image-28.png)
-*Suppression de l'environnement staticapp-new-feats*
+*Removing the staticapp-new-feats environment*
 
 
 
 ## 9. Deploy staging
 ### 9.1. Description 
-Le script "deploy staging" orchestre le déploiement de l'application static-webapp, basé sur l'image staticapp sur une instance EC2 AWS, représentant l'environnement de staging. L'image Docker de base utilise est Alpine, il met à jour les paquets et installe le client SSH. En utilisant SSH, il se connecte à l'instance EC2 avec les clés d'identification fournies et effectue plusieurs actions : il se connecte au registre Docker GitLab CI/CD pour télécharger l'image Docker associée à la branche actuelle (main), supprime un éventuel conteneur existant portant le nom "static-webapp" qui aurai été déployé précédement, puis lance un nouveau conteneur Docker à partir de l'image téléchargée. L'environnement "staging" est défini pour cette instance, avec une URL donnée, et le déploiement est limité à la branche principale ("main").
+The "deploy staging" script orchestrates the deployment of the static-webapp application, based on the staticapp image, on an AWS EC2 instance representing the staging environment. The base Docker image used is Alpine. It updates packages and installs the SSH client. Using SSH, it connects to the EC2 instance with the provided identity keys and performs several actions: it connects to the GitLab CI/CD Docker registry to download the Docker image associated with the current branch (main), removes any existing container named "static-webapp" that may have been previously deployed, then launches a new Docker container from the downloaded image. The "staging" environment is defined for this instance, with a given URL, and deployment is limited to the main branch ("main").
 
 >![Alt text](img/image-29.png)
 >![Alt text](img/image-30.png)
 
-### 9.2. Explications du script
-1. `deploy staging`: : Définit le nom du job de déploiement comme "deploy staging".
-2. image: alpine:latest : Spécifie l'image Docker à utiliser pour exécuter le job, dans ce cas, Alpine Linux.
-3. stage: Deploy staging : Indique le stade de déploiement dans le pipeline GitLab, ici "Deploy staging".
-4. script: 
-  - chmod og= $ID_RSA : Ajuste les permissions du fichier d'identification SSH pour que seul le propriétaire puisse y accéder.
-  - apk update && apk add openssh-client : Met à jour les paquets et installe le client SSH.
-  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY" : Utilise SSH pour se connecter à l'instance EC2, puis se connecte au registre Docker GitLab CI/CD pour l'authentification.
-  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}" : Télécharge l'image Docker associée à la branche actuelle depuis le registre Docker GitLab CI/CD.
-  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true" : Supprime le conteneur Docker existant s'il porte le nom "static-webapp".
-  - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}" : Lance un nouveau conteneur Docker à partir de l'image téléchargée, avec le nom "static-webapp" et exposant le port 80.
-5. environment: : Déclare l'environnement associé à cet déploiement.
-6. only: : Indique les conditions pour exécuter ce job, dans ce cas, il ne sera exécuté que pour la branche principale ("main").
+### 9.2. Explanations
+1. `deploy staging`: Defines the name of the deployment job as "deploy staging".
+2. image: alpine:latest: Specifies the Docker image to use for running the job, in this case, Alpine Linux.
+3. stage: Deploy staging: Indicates the deployment stage in the GitLab pipeline, here "Deploy staging".
+4. script:
+   - chmod og= $ID_RSA: Adjusts the permissions of the SSH identification file so that only the owner can access it.
+   - apk update && apk add openssh-client: Updates packages and installs the SSH client.
+   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY": Uses SSH to connect to the EC2 instance, then connects to the GitLab CI/CD Docker registry for authentication.
+   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}": Downloads the Docker image associated with the current branch from the GitLab CI/CD Docker registry.
+   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true": Removes the existing Docker container if it's named "static-webapp".
+   - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 80:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}": Launches a new Docker container from the downloaded image, with the name "static-webapp" and exposing port 80.
+5. environment: Declares the environment associated with this deployment.
+6. only: Indicates the conditions to run this job, in this case, it will only be executed for the main branch.
 
 ### 9.3. Setup (variable)
-Les variables configurées : 
-Définition de l'utilisateur et l'adresse ip à utiliser pour la connexion en ssh
+The configured variables:
+Definition of the user and the IP address to use for SSH connection.
 ````
 variables:
   SERVER_USER: ubuntu
   SERVER_IP: 54.90.253.3 #Public IP address EC2 on AWS
 ````
-ID_RSA : conrespond au contenu de fichier de clé privé généré lors de la création de l'intance ec2 sur laquelle sera déployé l'application en phase de staging, bien faire attention de définir le type de variable comme fichier `"file"` 
+`ID_RSA`: corresponds to the content of the private key file generated during the creation of the EC2 instance on which the application will be deployed in the staging phase. Be sure to define the variable type as a file `"file"`.
 >![Alt text](img/image-31.png)
 
 
 
-### 9.4. Rendu du déployement
-Une fois le merge requeste validé pour l'ajout de nouvelles fonctionnalité à la branche principale `main`, le deploiement de l'application static-webapp est lancé en environnement de staging
+### 9.4. Results
+Once the merge request for adding new features to the main branch `main` is approved, the deployment of the static-webapp application is initiated in the staging environment.
 >![Alt text](img/image-33.png)
 >![Alt text](img/image-34.png)
 
-#### Rendu Application static-webapp
+#### Results of static-webapp application 
 `http://54.90.253.3:80`
 >![Alt text](img/image-32.png)
 
 
 ## 10. Test staging
 ### 10.1. Description 
-Ce script définit un job de test appelé "test staging" qui hérite des paramètres du job "test" précédemment défini plus haut dans le fichier .gitlab-ci.yml. Il spécifie le stade "Test staging" dans le pipeline. De plus, il surcharge une variable d'environnement "DOMAIN" avec la valeur "http://$SERVER_IP", avec "$SERVER_IP" qui une variable d'environnement définie plus haut dans le pipeline. Ce job est destiné à tester les fonctionnalités de l'application sur un environnement de staging spécifique.
+This script defines a test job named "test staging" that inherits parameters from the "test" job previously defined higher up in the .gitlab-ci.yml file. It specifies the "Test staging" stage in the pipeline. Additionally, it overrides an environment variable "DOMAIN" with the value "http://$SERVER_IP", where "$SERVER_IP" is an environment variable defined earlier in the pipeline. This job is intended to test the application's features on a specific staging environment.
 
 >![Alt text](img/image-35.png)
 *definition du tamplete de test*
 >![Alt text](img/image-36.png)
 *définition du job de test en environnement de staging*
 
-### 10.2. Explications du script
-1. `test staging`: : Définit le nom du job, "test staging", qui sera affiché dans le pipeline du CI/CD.
+### 10.2. Explanations
+1. `test staging`: Defines the name of the job, "test staging", which will be displayed in the CI/CD pipeline.
 
-2. `<<: *test `: Utilise l'opérateur YAML pour inclure toutes les clés et valeurs du template `"test"`, permettant de réutiliser les paramètres définis dans le template `"test"` pour ce job.
+2. `<<: *test`: Uses the YAML operator to include all keys and values from the "test" template, allowing reuse of the parameters defined in the "test" template for this job.
 
-3. `stage: Test staging `: Indique le stade du pipeline auquel ce job appartient, ici "Test staging". Cette étape sera affichée dans l'interface du pipeline pour indiquer à quel moment le job est exécuté.
+3. `stage: Test staging`: Indicates the stage of the pipeline to which this job belongs, here "Test staging". This stage will be displayed in the pipeline interface to indicate when the job is executed.
 
-  - `variables:` : Déclare une section pour définir les variables spécifiques à ce job.
+   - `variables:`: Declares a section to define variables specific to this job.
 
-  - `DOMAIN: http://$SERVER_IP` : Définit une variable d'environnement appelée "DOMAIN" avec pour valeur "http:// $SERVER_IP". Ici, "$SERVER_IP" est une variable d'environnement qui sera remplacée par une adresse IP définie ailleurs dans le pipeline, et "DOMAIN" est utilisé pour définir le domaine sur lequel les tests seront exécutés.
+   - `DOMAIN: http://$SERVER_IP`: Defines an environment variable named "DOMAIN" with a value of "http://$SERVER_IP". Here, "$SERVER_IP" is an environment variable that will be replaced by an IP address defined elsewhere in the pipeline, and "DOMAIN" is used to specify the domain on which the tests will be executed.
 
 
-### 10.4. Rendu
+### 10.4. Results
 Réponse du `curl http://$DOMAIN | grep -i "dimension"`
 >![Alt text](img/image-38.png)
 >![Alt text](img/image-37.png)
 *test réussi*
 
-noté que certains stage ont été mis en commentaire, pour accélérer le rendu du pipeline.
-En environnement de production, toutes les étapes devrons être exécutées
+Note that some stages have been commented out to speed up the pipeline rendering. In the production environment, all stages will need to be executed.
 
 
 ## 11. Deploy staging
 ### 11.1. Description 
-Le déploiement en production est similaire au déploiement et test en staging ! 😊
-Reprendre le déploiement en staging en y apportant quelques modifications 
+Production deployment is similar to staging deployment and testing! 😊
+We'll proceed with the staging deployment, making a few modifications along the way.
 
-### 11.4. Rendu du déployement
+### 11.4. Results of deployment
 >![Alt text](img/image-41.png)
 *Validation du déploiement et du test en production*
 >![Alt text](img/image-40.png)
 *Reponse du test en production*
 
-#### Rendu Application webapp-prod
+#### Results of webapp-prod application
 >![Alt text](img/image-39.png)
 *Application disponible en production*
 
-## 12. Ressource complémentaire 
-### 12.1. Configuré un compte heroku
+## 12. Additional resource
+### 12.1. Set up a Heroku account
 [visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
 
-### 12.2. Mettre en place un runner privé avec gitlab-runner pour Docker
+### 12.2. Set up a private runner with GitLab Runner for Docker
 [visit this link to setup a private Docker gitlab-runner](https://gitlab.com/CarlinFongang/lab4-deployment)
 
-# Conclusion du projet.🙌
+# Conclusion of the project.🙌
 To be continious....
