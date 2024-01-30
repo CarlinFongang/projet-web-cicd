@@ -86,7 +86,7 @@ Create a hidden file named .gitlab-ci.yml and place it in the root directory of 
 
 ````
 cd projet-web-cicd/
-cat .gitlab-ci.yml
+touch .gitlab-ci.yml
 ````
 >![Alt text](img/image-7.png)
 
@@ -217,8 +217,8 @@ In the "Deploy review" stage, the pipeline is triggered only during merge reques
 >![Alt text](img/image-18.png)
 *setting variables*
 
-#### How to setup Heroku API and link to deploy envoronment
-[visit this link to setup heroku API ant url link for you gitlab account](https://gitlab.com/CarlinFongang/lab4-deployment)
+#### How to setup Heroku API and link to deploy envoronment ?
+[visit this link to setup Heroku API ant url link for you GitLab account](https://gitlab.com/CarlinFongang/lab4-deployment)
 
 
 ### 7.4. Setup a new branch in a same project
@@ -291,40 +291,36 @@ The "deploy staging" script orchestrates the deployment of the static-webapp app
     Here are the explanations for each line of the script:
 
  - 
- ````
- chmod og= $ID_RSA
- ````
+ `chmod og= $ID_RSA`
   This command changes the permissions of the file represented by the variable $ID_RSA by removing access permissions for groups and other users. This can be used to secure SSH private keys.
 
  - 
- ````
- apk update && apk add openssh-client
- ````
+ ` apk update && apk add openssh-client`
   These commands update the apk package repositories and install the OpenSSH client in the Alpine Linux image. The OpenSSH client is required for connecting to SSH servers.
 
  - 
- ````
+ `
  ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY"
- ````
- This line uses SSH to connect to a remote server specified by $SERVER_IP with the user $SERVER_USER, using the private key defined by $ID_RSA. Then, it executes a Docker command to authenticate to a Docker registry ($CI_REGISTRY) using the credentials specified by the environment variables $CI_REGISTRY_USER and $CI_REGISTRY_PASSWORD.
+ `
+ This line uses SSH to connect to a remote server specified by $SERVER_IP with the user $SERVER_USER, using the private key defined by `$ID_RSA`.
 
  - 
- ````
+ `
  ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
- ````
+ `
   This line uses SSH to connect to the remote server and executes a Docker command to pull a Docker image specified by ${IMAGE_NAME}:${CI_COMMIT_REF_NAME} from a Docker registry. This retrieves the latest version of the image for deployment.
 
  - 
- ````
+ `
  ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f static-webapp || true"
- ````
+ `
  This line uses SSH to connect to the remote server and removes the Docker container named "static-webapp" if it exists. The "|| true" ensures that the command will not fail if the container does not exist.
 
  - 
- ````
+ `
  ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --rm -d -p 344:80 --name static-webapp ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
- ```` 
- This line uses SSH to connect to the remote server and executes a Docker command to start a new Docker container named "static-webapp" from the image specified by ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}. The container is started in detached mode (-d) and exposes port 80 of the container on port 344 of the host machine.
+ ` 
+ This line uses SSH to connect to the remote server and executes a Docker command to start a new Docker container named "static-webapp" from the image specified by `${IMAGE_NAME}:${CI_COMMIT_REF_NAME}`. The container is started in detached mode (-d) and exposes port 80 of the container on port 344 of the host machine.
     
 
 5. environment: Declares the environment associated with this deployment.
@@ -347,10 +343,12 @@ variables:
 Once the merge request for adding new features to the main branch `main` is approved, the deployment of the static-webapp application is initiated in the staging environment.
 >![Alt text](img/image-33.png)
 >![Alt text](img/image-34.png)
+>![Alt text](img/image-42.png)
 
 #### Results of static-webapp application 
-`http://54.90.253.3:80`
+`http://34.234.93.228:344`
 >![Alt text](img/image-32.png)
+*Résultat du déployement en environnement de staging*
 
 
 ## 10. Test staging
@@ -358,6 +356,7 @@ Once the merge request for adding new features to the main branch `main` is appr
 This script defines a test job named "test staging" that inherits parameters from the "test" job previously defined higher up in the .gitlab-ci.yml file. It specifies the "Test staging" stage in the pipeline. Additionally, it overrides an environment variable "DOMAIN" with the value "http://$SERVER_IP", where "$SERVER_IP" is an environment variable defined earlier in the pipeline. This job is intended to test the application's features on a specific staging environment.
 
 >![Alt text](img/image-35.png)
+
 *definition du tamplete de test*
 >![Alt text](img/image-36.png)
 *définition du job de test en environnement de staging*
@@ -371,32 +370,35 @@ This script defines a test job named "test staging" that inherits parameters fro
 
    - `variables:`: Declares a section to define variables specific to this job.
 
-   - `DOMAIN: http://$SERVER_IP`: Defines an environment variable named "DOMAIN" with a value of "http://$SERVER_IP". Here, "$SERVER_IP" is an environment variable that will be replaced by an IP address defined elsewhere in the pipeline, and "DOMAIN" is used to specify the domain on which the tests will be executed.
+   - `DOMAIN: http://$SERVER_IP`: Defines an environment variable named "DOMAIN" with a value of `"http://$SERVER_IP"`. Here, `"$SERVER_IP"` is an environment variable that will be replaced by an IP address defined elsewhere in the pipeline, and "DOMAIN" is used to specify the domain on which the tests will be executed.
 
 
 ### 10.4. Results
 Réponse du `curl http://$DOMAIN | grep -i "dimension"`
 >![Alt text](img/image-38.png)
 >![Alt text](img/image-37.png)
-*test réussi*
+*Successful test*
 
 Note that some stages have been commented out to speed up the pipeline rendering. In the production environment, all stages will need to be executed.
 
 
-## 11. Deploy staging
+## 11. Deploy production
 ### 11.1. Description 
 Production deployment is similar to staging deployment and testing! 😊
 We'll proceed with the staging deployment, making a few modifications along the way.
 
 ### 11.4. Results of deployment
 >![Alt text](img/image-41.png)
-*Validation du déploiement et du test en production*
+*Validation of deployment and testing in production*
 >![Alt text](img/image-40.png)
-*Reponse du test en production*
+*Production test response*
+>![Alt text](img/image-43.png)
+*Production environment*
 
 #### Results of webapp-prod application
->![Alt text](img/image-39.png)
-*Application disponible en production*
+`http://34.234.93.228`
+>![Alt text](img/image-44.png)
+*Application available in production*
 
 ## 12. Additional resource
 ### 12.1. Set up a Heroku account
