@@ -69,7 +69,7 @@ deploy-review: #Review performed on a Heroku Dyno service
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: ${REVIEW_LINK}
-    on_stop: stop-review
+    #on_stop: stop-review
   script:
     - apk --no-cache add npm
     - npm install -g heroku
